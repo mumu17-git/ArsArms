@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.mumu17.arsarms.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "arsarms.refmap.json",
+  "mixins": [
+    "EntityHitResultMixin",
+    "LivingEntityMixin",
+    "ars.MethodTouchMixin",
+    "ars.SpellDamageEventMixin",
+    "ars.SpellResolverMixin",
+    "ars.SpellUtilMixin",
+    "tacz.AbstractGunItemMixin",
+    "tacz.EntityKineticBulletMixin",
+    "tacz.LivingEntityReloadMixin",
+    "tacz.LivingEntityShootMixin",
+    "tacz.ModernKineticGunItemMixin",
+    "tacz.ModernKineticGunScriptAPIMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
