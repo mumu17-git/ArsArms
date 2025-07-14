@@ -32,7 +32,7 @@ public class LivingEntityMixin {
     private static final int MAX_AMMO_COUNT = 9999;
 
     @Unique
-    private final long COOL_DOWN_TIME = 60;
+    private final long COOL_DOWN_TIME = 500L;
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void onTick(CallbackInfo ci) {
