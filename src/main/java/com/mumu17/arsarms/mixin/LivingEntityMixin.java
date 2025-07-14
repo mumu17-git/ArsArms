@@ -45,7 +45,7 @@ public class LivingEntityMixin {
                     long nowTime = System.currentTimeMillis();
                     long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
                     if (timestamp > 0) {
-                        if (nowTime - timestamp > COOL_DOWN_TIME)
+                        if (nowTime - timestamp > COOL_DOWN_TIME || gunItem.getCurrentAmmoCount(mainhand) <= 0)
                             removeReactiveFromGun(mainhand);
                     }
                 }
