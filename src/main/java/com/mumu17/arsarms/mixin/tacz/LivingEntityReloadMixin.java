@@ -7,19 +7,25 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
 import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
+import com.mumu17.arsarms.util.GunItemCooldown;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IAmmo;
+import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.entity.shooter.LivingEntityReload;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
+import com.tacz.guns.resource.pojo.data.gun.GunData;
 import com.tacz.guns.util.AttachmentDataUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -27,6 +33,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Map;
@@ -96,6 +103,9 @@ public class LivingEntityReloadMixin {
                     }
 
                     offhand.getOrCreateTag().putInt("Mana", chargedManaCount - cost * reloadAmmoCount);
+
+                    GunItemCooldown gunItemCooldown = (GunItemCooldown) gunItem;
+                    gunItemCooldown.setLastAmmoCount(currentGunItem, reloadAmmoCount);
                 }
                 if (!flag00) {
                     access.setReloadAmoData(currentGunItem, false);
@@ -105,5 +115,24 @@ public class LivingEntityReloadMixin {
             }
         }
         return true;
+    }
+
+    @Unique
+    private int handleInventoryAmmo(ItemStack stack, Inventory inventory) {
+        int cacheInventoryAmmoCount = 0;
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack inventoryItem = inventory.getItem(i);
+            if (inventoryItem.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(stack, inventoryItem)) {
+                cacheInventoryAmmoCount += inventoryItem.getCount();
+            }
+            if (inventoryItem.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryItem)) {
+                if (iAmmoBox.isAllTypeCreative(inventoryItem) || iAmmoBox.isCreative(inventoryItem)) {
+                    cacheInventoryAmmoCount = 9999;
+                    return cacheInventoryAmmoCount;
+                }
+                cacheInventoryAmmoCount += iAmmoBox.getAmmoCount(inventoryItem);
+            }
+        }
+        return cacheInventoryAmmoCount;
     }
 }

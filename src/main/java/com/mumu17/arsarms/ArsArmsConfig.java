@@ -22,7 +22,7 @@ public class ArsArmsConfig {
                     .defineInRange("damageMultiplier", 0.0, 0.0, 1.0);
             damageAmplifier = builder
                     .comment("Magic damage amplifier for TaCZ Gun projectiles.\nThe higher the value, the less damage.")
-                    .defineInRange("damageAmplifier", 20.0, 0.1, 1000.0);
+                    .defineInRange("damageAmplifier", 15.0, 0.01, 100.0);
         }
     }
 }

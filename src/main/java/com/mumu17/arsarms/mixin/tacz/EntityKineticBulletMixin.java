@@ -1,11 +1,13 @@
 package com.mumu17.arsarms.mixin.tacz;
 
+import com.hollingsworth.arsnouveau.api.spell.AbstractSpellPart;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
+import com.mumu17.arsarms.util.GunItemCooldown;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.pojo.data.gun.ExtraDamage;
@@ -48,9 +50,9 @@ public class EntityKineticBulletMixin {
         if (attacker instanceof Player player) {
             ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
+            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 double amp = ArsArmsConfig.COMMON.damageAmplifier.get() != 0 ? ArsArmsConfig.COMMON.damageAmplifier.get() : 1.0;
-                ArsArmsProjectileData.set(result.getEntity(), null, InteractionHand.OFF_HAND, (float) (mainhand.getDamageValue() * amp));
+                ArsArmsProjectileData.set(result.getEntity(), null, InteractionHand.OFF_HAND, mainhand);
             }
         }
     }
@@ -77,7 +79,11 @@ public class EntityKineticBulletMixin {
             InteractionHand hand = ArsArmsProjectileData.getHand();
             if (hand == InteractionHand.OFF_HAND) {
                 if (entity != null) {
-                    return (float) (original * ArsArmsConfig.COMMON.damageMultiplier.get());
+                    if (((EntityKineticBullet)(Object)this).getOwner() instanceof Player player) {
+                        GunItemCooldown gunItemCooldown = (GunItemCooldown) player.getMainHandItem().getItem();
+                        gunItemCooldown.setGunDamage(player.getMainHandItem(), original);
+                        return (float) (original * ArsArmsConfig.COMMON.damageMultiplier.get());
+                    }
                 }
             }
         }
@@ -90,9 +96,9 @@ public class EntityKineticBulletMixin {
         if (attacker instanceof Player player) {
             ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
+            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 double amp = ArsArmsConfig.COMMON.damageAmplifier.get() != 0 ? ArsArmsConfig.COMMON.damageAmplifier.get() : 1.0;
-                ArsArmsProjectileData.set(null, result, InteractionHand.OFF_HAND, (float) (mainhand.getDamageValue() * amp));
+                ArsArmsProjectileData.set(null, result, InteractionHand.OFF_HAND, mainhand);
             }
         }
     }

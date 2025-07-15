@@ -7,8 +7,8 @@
   "mixins": [
     "EntityHitResultMixin",
     "LivingEntityMixin",
+    "ars.AbstractEffectMixin",
     "ars.MethodTouchMixin",
-    "ars.SpellDamageEventMixin",
     "ars.SpellResolverMixin",
     "ars.SpellUtilMixin",
     "tacz.AbstractGunItemMixin",

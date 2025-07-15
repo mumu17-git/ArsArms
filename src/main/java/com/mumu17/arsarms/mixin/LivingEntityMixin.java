@@ -32,7 +32,7 @@ public class LivingEntityMixin {
     private static final int MAX_AMMO_COUNT = 9999;
 
     @Unique
-    private final long COOL_DOWN_TIME = 500L;
+    private static final long COOL_DOWN_TIME = 500L;
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void onTick(CallbackInfo ci) {
@@ -45,8 +45,28 @@ public class LivingEntityMixin {
                     long nowTime = System.currentTimeMillis();
                     long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
                     if (timestamp > 0) {
-                        if (nowTime - timestamp > COOL_DOWN_TIME || gunItem.getCurrentAmmoCount(mainhand) <= 0)
+                        if (nowTime - timestamp > COOL_DOWN_TIME)
                             removeReactiveFromGun(mainhand);
+                    }
+                } else {
+                    GunItemCooldown gunItemCooldown = (GunItemCooldown) gunItem;
+                    long nowTime = System.currentTimeMillis();
+                    long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
+                    if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
+                        CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(mainhand)).orElse(null);
+                        if (index != null) {
+                            GunData gunData = index.getGunData();
+                            int ammoCount = gunItem.useInventoryAmmo(mainhand) ? handleInventoryAmmo(mainhand, player.getInventory()) + (modernKineticGunItem.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                    modernKineticGunItem.getCurrentAmmoCount(mainhand) + (modernKineticGunItem.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                            ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
+                            int lastAmmoCount = gunItemCooldown.getLastAmmoCount(mainhand);
+                            if (timestamp > 0) {
+                                if (nowTime - timestamp > COOL_DOWN_TIME && ammoCount <= lastAmmoCount && lastAmmoCount <= 0) {
+                                    gunItemCooldown.setLastAmmoCount(mainhand, -1);
+                                    removeReactiveFromGun(mainhand);
+                                }
+                            }
+                        }
                     }
                 }
             }

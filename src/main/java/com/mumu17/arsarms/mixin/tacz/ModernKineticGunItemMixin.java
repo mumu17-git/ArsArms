@@ -73,6 +73,39 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
         return 0L;
     }
 
+    @Unique
+    @Override
+    public void setLastAmmoCount(ItemStack gunItem, int ammoCount) {
+        CompoundTag tag = gunItem.getOrCreateTag();
+        tag.putInt("LastAmmoCount", ammoCount);
+    }
+
+    @Unique
+    @Override
+    public int getLastAmmoCount(ItemStack gunItem) {
+        CompoundTag tag = gunItem.getTag();
+        if (tag != null && tag.contains("LastAmmoCount")) {
+            return tag.getInt("LastAmmoCount");
+        }
+        return 0;
+    }
+
+    @Unique
+    @Override
+    public void setGunDamage(ItemStack gunItem, float ammoCount) {
+        CompoundTag tag = gunItem.getOrCreateTag();
+        tag.putFloat("LastGunDamage", ammoCount);
+    }
+
+    @Unique
+    @Override
+    public float getGunDamage(ItemStack gunItem) {
+        CompoundTag tag = gunItem.getTag();
+        if (tag != null && tag.contains("LastGunDamage")) {
+            return tag.getFloat("LastGunDamage");
+        }
+        return 0.0F;
+    }
 
     @Inject(method = "shoot", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Optional;ofNullable(Ljava/lang/Object;)Ljava/util/Optional;"), remap = false)
     public void shoot(ShooterDataHolder dataHolder, ItemStack gunItem, Supplier<Float> pitch, Supplier<Float> yaw, LivingEntity shooter, CallbackInfo ci) {
@@ -87,7 +120,8 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
                             int ammoCount = useInventoryAmmo ? handleInventoryAmmo(gunItem, player.getInventory()) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                             iGun.getCurrentAmmoCount(gunItem) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                            if (ammoCount <= 1) {
+                            // if (ammoCount <= 1) {
+                            if (false) {
                                 ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) iGun;
                                 ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(gunItem);
                                 if (reloadAmmoData != null) {
