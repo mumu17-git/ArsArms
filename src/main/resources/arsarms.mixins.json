@@ -7,7 +7,6 @@
   "mixins": [
     "EntityHitResultMixin",
     "LivingEntityMixin",
-    "ars.AbstractEffectMixin",
     "ars.MethodTouchMixin",
     "ars.SpellResolverMixin",
     "ars.SpellUtilMixin",
@@ -19,9 +18,11 @@
     "tacz.LivingEntityShootMixin",
     "tacz.ModernKineticGunItemMixin",
     "tacz.ModernKineticGunScriptAPIMixin",
-    "tacz.ProjectileExplosionMixin"
+    "tacz.ProjectileExplosionMixin",
+    "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "client": [
+    "GuiGraphicsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

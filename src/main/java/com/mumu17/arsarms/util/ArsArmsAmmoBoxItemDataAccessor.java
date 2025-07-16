@@ -62,7 +62,7 @@ public class ArsArmsAmmoBoxItemDataAccessor implements AmmoBoxItemDataAccessor {
                     }
                 }
 
-                if (((AmmoBoxItemDataAccessor) this).isAllTypeCreative(ammoBox)) {
+                if (this.isAllTypeCreative(ammoBox)) {
                     return true;
                 }
 

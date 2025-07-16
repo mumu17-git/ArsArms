@@ -10,14 +10,11 @@ import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.List;
 
 @Mod.EventBusSubscriber(modid = ArsArms.MODID, value = Dist.CLIENT)
 public class ChargeManaToAmmoBoxTick {
@@ -26,24 +23,12 @@ public class ChargeManaToAmmoBoxTick {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
-            List<Slot> slots = mc.player.inventoryMenu.slots;
-            for (Slot slot : slots) {
-                ItemStack stack = slot.getItem();
-                if (isTargetItem(stack)) {
-                    PlayerAmmoConsumer.setPlayer(mc.player);
-                    int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(stack);
-                    int maxManaCount = ArsArmsAmmoBox.getMaxManaCount(stack);
-                    if (chargedManaCount > maxManaCount) {
-                        sendManaCountToServer(maxManaCount, slot.getSlotIndex());
-                    }
-                }
-            }
+            PlayerAmmoConsumer.setPlayer(mc.player);
             ItemStack offhand = mc.player.getOffhandItem();
             if (isTargetItem(offhand)) {
                 chargeManaOrCancel(mc.player);
             }
         }
-        PlayerAmmoConsumer.clearPlayer();
     }
 
     private static void chargeManaOrCancel(LocalPlayer player) {

@@ -6,7 +6,11 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.config.sync.SyncConfig;
 import com.tacz.guns.item.AmmoBoxItem;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,18 +21,15 @@ public class ArsArmsAmmoBox {
         if (stack.getItem() instanceof AmmoBoxItem ammoBoxItem) {
             ResourceLocation boxAmmoId = ammoBoxItem.getAmmoId(stack);
 
-            if (boxAmmoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
-                if (stack.getOrCreateTag().contains("LastAmmoStackSize")) {
-                    return stack.getOrCreateTag().getInt("LastAmmoStackSize");
-                } else {
-                    return 0;
-                }
-            }
             AtomicInteger maxSize = new AtomicInteger();
             TimelessAPI.getCommonAmmoIndex(boxAmmoId).ifPresent((index) -> {
                 int boxLevelMultiplier = ammoBoxItem.getAmmoLevel(stack) + 1;
-                PlayerAmmoConsumer.getPlayer().getOffhandItem().getOrCreateTag().putInt("LastAmmoStackSize", index.getStackSize());
-                maxSize.set(index.getStackSize() * (Integer) SyncConfig.AMMO_BOX_STACK_SIZE.get() * boxLevelMultiplier);
+                if (!boxAmmoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
+                    stack.getOrCreateTag().putInt("LastAmmoStackSize", index.getStackSize());
+                    maxSize.set(index.getStackSize() * (Integer) SyncConfig.AMMO_BOX_STACK_SIZE.get() * boxLevelMultiplier);
+                } else {
+                    maxSize.set(stack.getOrCreateTag().getInt("LastAmmoStackSize") * (Integer) SyncConfig.AMMO_BOX_STACK_SIZE.get() * boxLevelMultiplier);
+                }
             });
 
             ReactiveCaster casterData = new ReactiveCaster(stack);
