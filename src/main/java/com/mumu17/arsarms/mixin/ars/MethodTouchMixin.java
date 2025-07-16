@@ -14,6 +14,7 @@ import com.hollingsworth.arsnouveau.common.spell.augment.AugmentAmplify;
 import com.hollingsworth.arsnouveau.common.spell.method.MethodTouch;
 import com.hollingsworth.arsnouveau.common.util.SpellPartConfigUtil;
 import com.mumu17.arsarms.ArsArmsConfig;
+import com.mumu17.arsarms.util.ArsArmsBulletModifier;
 import com.mumu17.arsarms.util.ArsArmsProjectileData;
 import com.mumu17.arsarms.util.GunItemCooldown;
 import net.minecraft.resources.ResourceLocation;
@@ -65,7 +66,7 @@ public class MethodTouchMixin {
             Entity entity = ArsArmsProjectileData.getTargetEntity();
             InteractionHand hand = ArsArmsProjectileData.getHand();
             GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
-            float damageMultiply =  (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue());
+            float damageMultiply = (float) ArsArmsBulletModifier.getAmplifier((gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun())));
             if (hand == InteractionHand.OFF_HAND) {
                 if (entity != null) {
                     List<AbstractSpellPart> modified_parts = new ArrayList<>(List.copyOf(original.spell.recipe));
@@ -110,7 +111,7 @@ public class MethodTouchMixin {
             BlockHitResult blockHR = ArsArmsProjectileData.getBlockHitResult();
             InteractionHand hand = ArsArmsProjectileData.getHand();
             GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
-            float damageMultiply =  (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue());
+            float damageMultiply =  (float) ArsArmsBulletModifier.getAmplifier(gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()));
             if (hand == InteractionHand.OFF_HAND) {
                 if (blockHR != null) {
                     List<AbstractSpellPart> modified_parts = new ArrayList<>(List.copyOf(original.spell.recipe));

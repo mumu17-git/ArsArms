@@ -1,20 +1,23 @@
 package com.mumu17.arsarms.client;
 
-import com.hollingsworth.arsnouveau.api.spell.Spell;
 import com.hollingsworth.arsnouveau.api.util.ManaUtil;
-import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.network.ArsArmsNetworkHandler;
 import com.mumu17.arsarms.network.RequestSyncChargedManaMessage;
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
+import com.mumu17.arsarms.util.PlayerAmmoConsumer;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = ArsArms.MODID, value = Dist.CLIENT)
 public class ChargeManaToAmmoBoxTick {
@@ -23,11 +26,24 @@ public class ChargeManaToAmmoBoxTick {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
+            List<Slot> slots = mc.player.inventoryMenu.slots;
+            for (Slot slot : slots) {
+                ItemStack stack = slot.getItem();
+                if (isTargetItem(stack)) {
+                    PlayerAmmoConsumer.setPlayer(mc.player);
+                    int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(stack);
+                    int maxManaCount = ArsArmsAmmoBox.getMaxManaCount(stack);
+                    if (chargedManaCount > maxManaCount) {
+                        sendManaCountToServer(maxManaCount, slot.getSlotIndex());
+                    }
+                }
+            }
             ItemStack offhand = mc.player.getOffhandItem();
             if (isTargetItem(offhand)) {
                 chargeManaOrCancel(mc.player);
             }
         }
+        PlayerAmmoConsumer.clearPlayer();
     }
 
     private static void chargeManaOrCancel(LocalPlayer player) {
@@ -49,14 +65,14 @@ public class ChargeManaToAmmoBoxTick {
                 return;
             }
             
-            sendManaCountToServer(Math.min((int)(chargedManaCount + mana), maxManaCount));
+            sendManaCountToServer(Math.min((int)(chargedManaCount + mana), maxManaCount), Inventory.SLOT_OFFHAND);
 
         }
 
     }
 
-    public static void sendManaCountToServer(int manaCount) {
-        ArsArmsNetworkHandler.CHANNEL.sendToServer(new RequestSyncChargedManaMessage(manaCount));
+    public static void sendManaCountToServer(int manaCount, int slotIndex) {
+        ArsArmsNetworkHandler.CHANNEL.sendToServer(new RequestSyncChargedManaMessage(manaCount, slotIndex));
     }
 
     private static boolean isTargetItem(ItemStack stack) {

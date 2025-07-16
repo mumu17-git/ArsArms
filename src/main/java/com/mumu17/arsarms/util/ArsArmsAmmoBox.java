@@ -18,11 +18,16 @@ public class ArsArmsAmmoBox {
             ResourceLocation boxAmmoId = ammoBoxItem.getAmmoId(stack);
 
             if (boxAmmoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
-                return 0;
+                if (stack.getOrCreateTag().contains("LastAmmoStackSize")) {
+                    return stack.getOrCreateTag().getInt("LastAmmoStackSize");
+                } else {
+                    return 0;
+                }
             }
             AtomicInteger maxSize = new AtomicInteger();
             TimelessAPI.getCommonAmmoIndex(boxAmmoId).ifPresent((index) -> {
                 int boxLevelMultiplier = ammoBoxItem.getAmmoLevel(stack) + 1;
+                PlayerAmmoConsumer.getPlayer().getOffhandItem().getOrCreateTag().putInt("LastAmmoStackSize", index.getStackSize());
                 maxSize.set(index.getStackSize() * (Integer) SyncConfig.AMMO_BOX_STACK_SIZE.get() * boxLevelMultiplier);
             });
 

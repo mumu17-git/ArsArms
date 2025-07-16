@@ -11,12 +11,15 @@
     "ars.MethodTouchMixin",
     "ars.SpellResolverMixin",
     "ars.SpellUtilMixin",
+    "arsarms.ArsArmsAmmoBoxItemDataAccessorMixin",
     "tacz.AbstractGunItemMixin",
+    "tacz.AmmoBoxItemMixin",
     "tacz.EntityKineticBulletMixin",
     "tacz.LivingEntityReloadMixin",
     "tacz.LivingEntityShootMixin",
     "tacz.ModernKineticGunItemMixin",
-    "tacz.ModernKineticGunScriptAPIMixin"
+    "tacz.ModernKineticGunScriptAPIMixin",
+    "tacz.ProjectileExplosionMixin"
   ],
   "client": [
   ],

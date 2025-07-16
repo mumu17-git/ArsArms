@@ -15,6 +15,6 @@ public class ModernKineticGunScriptAPIMixin {
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
     public void consumeAmmoFromPlayer(CallbackInfoReturnable<Integer> cir) {
-        PlayerAmmoConsumer.set(shooter.getOffhandItem());
+        PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
     }
 }

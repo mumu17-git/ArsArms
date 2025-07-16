@@ -4,11 +4,18 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.api.item.nbt.AmmoBoxItemDataAccessor;
+import com.tacz.guns.item.AmmoBoxItem;
+import com.tacz.guns.item.ModernKineticGunItem;
+import com.tacz.guns.resource.index.CommonGunIndex;
+import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Objects;
 
 public class ArsArmsAmmoBoxItemDataAccessor implements AmmoBoxItemDataAccessor {
     public boolean isAmmoBoxOfGun(ItemStack gun, ItemStack ammoBox, boolean isFirst) {
@@ -49,7 +56,7 @@ public class ArsArmsAmmoBoxItemDataAccessor implements AmmoBoxItemDataAccessor {
                         }
                     }
                     if (flag01) {
-                        if (ammoBoxTag != gunTag) {
+                        if (!Objects.requireNonNull(ammoBoxTag).equals(gunTag)) {
                             return false;
                         }
                     }
@@ -62,6 +69,27 @@ public class ArsArmsAmmoBoxItemDataAccessor implements AmmoBoxItemDataAccessor {
                 ResourceLocation ammoId = iAmmoBox.getAmmoId(ammoBox);
                 if (ammoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
                     return false;
+                }
+
+
+                if (PlayerAmmoConsumer.getOffHand().getItem() instanceof IAmmoBox offhandIAmmoBox) {
+                    ResourceLocation offhandAmmoId = offhandIAmmoBox.getAmmoId(PlayerAmmoConsumer.getOffHand());
+                    if (!offhandAmmoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
+                        if (!ammoId.equals(offhandAmmoId)) {
+                            return false;
+                        }
+                    }
+                }
+
+                if (gun.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
+                    CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(gun)).orElse(null);
+                    if (index != null) {
+                        GunData gunData = index.getGunData();
+                        ResourceLocation gunAmmoId = gunData.getAmmoId();
+                        if (!ammoId.equals(gunAmmoId)) {
+                            return false;
+                        }
+                    }
                 }
 
                 ResourceLocation gunId = iGun.getGunId(gun);

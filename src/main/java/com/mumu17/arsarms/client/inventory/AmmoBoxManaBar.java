@@ -2,9 +2,11 @@ package com.mumu17.arsarms.client.inventory;
 
 import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
+import com.mumu17.arsarms.util.PlayerAmmoConsumer;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +24,9 @@ public class AmmoBoxManaBar {
     public static void onRenderForeground(ContainerScreenEvent.Render.Foreground event) {
         AbstractContainerScreen<?> screen = event.getContainerScreen();
         GuiGraphics graphics = event.getGuiGraphics();
-
+        Minecraft mc = screen.getMinecraft();
+        if (mc.player == null) return;
+        PlayerAmmoConsumer.setPlayer(mc.player);
         for (Slot slot : screen.getMenu().slots) {
             ItemStack stack = slot.getItem();
             if (!isAmmoBox(stack)) continue;
@@ -40,6 +44,7 @@ public class AmmoBoxManaBar {
 
             graphics.fill(x, y, x + barWidth, y + barHeight, 0xFFAA00FF);
         }
+        PlayerAmmoConsumer.clearPlayer();
     }
 
     public static boolean isAmmoBox(ItemStack stack) {

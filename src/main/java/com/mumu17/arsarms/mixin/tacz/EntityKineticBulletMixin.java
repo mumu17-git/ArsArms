@@ -1,13 +1,13 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.hollingsworth.arsnouveau.api.spell.AbstractSpellPart;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
+import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
 import com.mumu17.arsarms.util.GunItemCooldown;
+import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.pojo.data.gun.ExtraDamage;
@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +28,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.LinkedList;
@@ -34,14 +36,20 @@ import java.util.LinkedList;
 @Mixin(EntityKineticBullet.class)
 public class EntityKineticBulletMixin {
 
-    @Shadow(remap = false) private LinkedList<ExtraDamage.DistanceDamagePair> damageAmount;
+    @Shadow(remap = false) private float explosionDamage;
+    @Shadow(remap = false) private boolean explosion;
 
     @Unique
     public void ArsArms$castSpell(LivingEntity playerIn, ItemStack s) {
-        if ((double)s.getEnchantmentLevel((Enchantment) EnchantmentRegistry.REACTIVE_ENCHANTMENT.get()) * (double)0.25F >= Math.random() && (new ReactiveCaster(s)).getSpell().isValid()) {
+        if (ArsArms$canCastSpell(s)) {
             ReactiveCaster reactiveCaster = new ReactiveCaster(s);
             reactiveCaster.castSpell(playerIn.getCommandSenderWorld(), playerIn, InteractionHand.OFF_HAND, (Component)null);
         }
+    }
+
+    @Unique
+    public boolean ArsArms$canCastSpell(ItemStack s) {
+        return (double)s.getEnchantmentLevel((Enchantment) EnchantmentRegistry.REACTIVE_ENCHANTMENT.get()) * (double)0.25F >= Math.random() && (new ReactiveCaster(s)).getSpell().isValid();
     }
 
     @Inject(method = "onHitEntity", at = @At(value = "HEAD"), remap = false)
@@ -50,8 +58,7 @@ public class EntityKineticBulletMixin {
         if (attacker instanceof Player player) {
             ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
-                double amp = ArsArmsConfig.COMMON.damageAmplifier.get() != 0 ? ArsArmsConfig.COMMON.damageAmplifier.get() : 1.0;
+            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 ArsArmsProjectileData.set(result.getEntity(), null, InteractionHand.OFF_HAND, mainhand);
             }
         }
@@ -68,6 +75,33 @@ public class EntityKineticBulletMixin {
                     ArsArms$castSpell(player, mainhand);
                 }
                 ArsArmsProjectileData.clear();
+            }
+        }
+    }
+
+    @Inject(method = "onHitEntity", at = @At(value = "FIELD", target = "Lcom/tacz/guns/entity/EntityKineticBullet;explosion:Z", shift = At.Shift.AFTER), remap = false)
+    public void explosionDamage(TacHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci) {
+        if (explosion) {
+            LivingEntity attacker = ((EntityKineticBullet) (Object) this).getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
+            if (attacker instanceof Player player) {
+                ItemStack gunItem = player.getItemInHand(InteractionHand.MAIN_HAND);
+                if (gunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
+                    Entity entity = ArsArmsProjectileData.getTargetEntity();
+                    InteractionHand hand = ArsArmsProjectileData.getHand();
+                    if (hand == InteractionHand.OFF_HAND) {
+                        if (entity != null) {
+                            ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
+                            ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(gunItem);
+                            if (reloadAmmoData != null) {
+                                boolean isArsMode = reloadAmmoData.isArsMode();
+                                System.out.println(isArsMode);
+                                if (isArsMode) {
+                                    explosionDamage *= ArsArmsConfig.COMMON.damageMultiplier.get();
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -96,8 +130,7 @@ public class EntityKineticBulletMixin {
         if (attacker instanceof Player player) {
             ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
-                double amp = ArsArmsConfig.COMMON.damageAmplifier.get() != 0 ? ArsArmsConfig.COMMON.damageAmplifier.get() : 1.0;
+            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 ArsArmsProjectileData.set(null, result, InteractionHand.OFF_HAND, mainhand);
             }
         }

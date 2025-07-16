@@ -1,13 +1,7 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.google.common.collect.Multimap;
-import com.hollingsworth.arsnouveau.api.event.SpellDamageEvent;
-import com.hollingsworth.arsnouveau.api.perk.PerkAttributes;
 import com.hollingsworth.arsnouveau.api.spell.*;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mumu17.arsarms.ArsArms;
-import com.mumu17.arsarms.ArsArmsConfig;
 import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
 import com.mumu17.arsarms.util.GunItemCooldown;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
@@ -24,19 +18,14 @@ import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -109,12 +98,6 @@ public class LivingEntityShootMixin {
                                 ReactiveCaster casterData = new ReactiveCaster(offhand);
                                 Spell spell = casterData.getSpell();
 
-                                double amplification = ArsArmsConfig.COMMON.damageAmplifier.get() != 0.0 ? ArsArmsConfig.COMMON.damageAmplifier.get() : 1.0;
-
-                                SpellStats.Builder spellStatsBuilder = new SpellStats.Builder().addDamageModifier((double) currentGunItem.getDamageValue() / amplification);
-
-                                AbstractSpellPart spellPart = spell.recipe.get(0).getGlyph().spellPart;
-
                                 int cost = spell.getCost();
 
                                 int reloadAmmoCount = 0;
@@ -173,7 +156,7 @@ public class LivingEntityShootMixin {
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
     public void consumeAmmoFromPlayer(CallbackInfo ci) {
-        PlayerAmmoConsumer.set(shooter.getOffhandItem());
+        PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
     }
 
 

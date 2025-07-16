@@ -21,16 +21,16 @@ public abstract class AbstractEffectMixin {
     @Inject(method = "<init>(Ljava/lang/String;Ljava/lang/String;)V", at = @At("TAIL"), remap = false)
     private void AbstractEffect(String tag, String description, CallbackInfo ci) {
         if (ArsArmsProjectileData.isEnabled()) {
-            GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
-            DAMAGE.set(DAMAGE.get() * (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue()));
+            /*GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
+            DAMAGE.setOffhand(DAMAGE.get() * (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue()));*/
         }
     }
 
     @Inject(method = "<init>(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)V", at = @At("TAIL"), remap = false)
     private void AbstractEffect(ResourceLocation tag, String description, CallbackInfo ci) {
         if (ArsArmsProjectileData.isEnabled()) {
-            GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
-            DAMAGE.set(DAMAGE.get() * (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue()));
+            /*GunItemCooldown gunItemCooldown = (GunItemCooldown) ArsArmsProjectileData.getCurrentGun().getItem();
+            DAMAGE.setOffhand(DAMAGE.get() * (gunItemCooldown.getGunDamage(ArsArmsProjectileData.getCurrentGun()) / ArsArmsConfig.COMMON.damageAmplifier.get().floatValue()));*/
         }
     }
 }

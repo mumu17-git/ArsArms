@@ -9,33 +9,40 @@ import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class RequestSyncChargedManaMessage {
     private final int manaCount;
+    private final int ammoBox;
 
-    public RequestSyncChargedManaMessage(int ManaCount) {
+    public RequestSyncChargedManaMessage(int ManaCount, int stack) {
         this.manaCount = ManaCount;
+        this.ammoBox = stack;
     }
 
     public static void encode(RequestSyncChargedManaMessage msg, FriendlyByteBuf buf) {
         buf.writeInt(msg.manaCount);
+        buf.writeInt(msg.ammoBox);
     }
 
     public static RequestSyncChargedManaMessage decode(FriendlyByteBuf buf) {
-        return new RequestSyncChargedManaMessage(buf.readInt());
+        return new RequestSyncChargedManaMessage(buf.readInt(), buf.readInt());
     }
 
     public static void handle(RequestSyncChargedManaMessage msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             var player = ctx.get().getSender();
             if (player != null) {
-                var stack = player.getOffhandItem();
+                var stack = player.getInventory().getItem(msg.ammoBox);
                 if (!stack.isEmpty() && stack.getItem() instanceof AmmoBoxItem) {
                     int chargedManaCount = stack.getOrCreateTag().getInt("Mana");
-                    CapabilityRegistry.getMana(player).ifPresent((mana) -> mana.removeMana((double) msg.manaCount - (double) chargedManaCount));
+                    double removeManaCount = ((double) msg.manaCount - (double) chargedManaCount);
+                    if (removeManaCount > 0.0) {
+                        CapabilityRegistry.getMana(player).ifPresent((mana) -> mana.removeMana(removeManaCount));
+                    }
                     stack.getOrCreateTag().putInt("Mana", msg.manaCount);
                 }
             }

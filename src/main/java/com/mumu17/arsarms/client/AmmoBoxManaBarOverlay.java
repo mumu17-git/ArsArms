@@ -1,6 +1,7 @@
 package com.mumu17.arsarms.client;
 
 import com.mumu17.arsarms.client.inventory.AmmoBoxManaBar;
+import com.mumu17.arsarms.util.PlayerAmmoConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,7 +22,7 @@ public class AmmoBoxManaBarOverlay implements IGuiOverlay {
         Screen screen = mc.screen;
         if (mc.player == null || mc.options.hideGui) return;
         Player player = mc.player;
-
+        PlayerAmmoConsumer.setPlayer(mc.player);
         int hotbarY = screenHeight - 22;
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getItem(i);
@@ -54,5 +55,6 @@ public class AmmoBoxManaBarOverlay implements IGuiOverlay {
                 graphics.fill(x, y, x + barWidth, y + barHeight, 0xFFAA00FF);
             }
         }
+        PlayerAmmoConsumer.clearPlayer();
     }
 }
