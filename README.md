@@ -27,10 +27,10 @@
 
 ### **Settings**
 
-*   `**damageMultiplier** (Default: 0.0)`  
+*   `damageMultiplier (Default: 0.0)`  
     The damage multiplier for bullets fired from TaCZ guns.  
     _Higher values result in increased damage._
-*   `**damageAmplifier** (Default: 15.0)`  
+*   `damageAmplifier (Default: 15.0)`  
     The magic damage amplification value for bullets fired from TaCZ guns.  
     _Higher values result in **lower** damage._
 
