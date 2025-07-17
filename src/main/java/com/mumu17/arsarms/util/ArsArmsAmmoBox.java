@@ -6,11 +6,7 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.config.sync.SyncConfig;
 import com.tacz.guns.item.AmmoBoxItem;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +35,26 @@ public class ArsArmsAmmoBox {
             return cost * maxSize.get();
         }
 
+        return 0;
+    }
+
+    public static int getMaxChargedManaCount(ItemStack stack) {
+        if (stack.getItem() instanceof AmmoBoxItem ammoBoxItem) {
+            ResourceLocation boxAmmoId = ammoBoxItem.getAmmoId(stack);
+
+            AtomicInteger size = new AtomicInteger();
+            if (!boxAmmoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
+                size.set(ammoBoxItem.getAmmoCount(stack));
+            } else {
+                size.set(0);
+            }
+
+            ReactiveCaster casterData = new ReactiveCaster(stack);
+            Spell spell = casterData.getSpell();
+            int cost = spell.getCost();
+
+            return cost * size.get();
+        }
         return 0;
     }
 

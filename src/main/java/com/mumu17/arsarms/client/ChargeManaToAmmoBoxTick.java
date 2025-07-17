@@ -46,7 +46,9 @@ public class ChargeManaToAmmoBoxTick {
 
             int maxManaCount = ArsArmsAmmoBox.getMaxManaCount(offhand);
 
-            if (chargedManaCount >= maxManaCount) {
+            int maxChargedManaCount = ArsArmsAmmoBox.getMaxChargedManaCount(offhand);
+
+            if (chargedManaCount >= maxChargedManaCount) {
                 return;
             }
             

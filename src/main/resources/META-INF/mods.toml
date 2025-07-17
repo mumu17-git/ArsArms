@@ -71,9 +71,9 @@ description='''${mod_description}'''
    side="BOTH"
 
 [[dependencies."${mod_id}"]]
-    # This is a dependency on the mod itself, which is useful for mods that have multiple modules
-    modId="ars_nouveau"
-    mandatory=true
-    versionRange="[${ars_nouveau_version},)"
-    ordering="NONE"
-    side="BOTH"
+   # This is a dependency on the mod itself, which is useful for mods that have multiple modules
+   modId="ars_nouveau"
+   mandatory=true
+   versionRange="[${ars_nouveau_version},)"
+   ordering="NONE"
+   side="BOTH"

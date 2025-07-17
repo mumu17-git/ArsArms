@@ -53,7 +53,7 @@ public class ArsArmsReloadArsModeActive {
                     currentGunItem.getOrCreateTag().put("ars_nouveau:reactive_caster", ammoBoxTag);
                 }
 
-                int chargedManaCount = offhand.getOrCreateTag().getInt("Mana");
+                int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(offhand);
                 ReactiveCaster casterData = new ReactiveCaster(offhand);
                 Spell spell = casterData.getSpell();
 
