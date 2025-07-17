@@ -4,9 +4,7 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.api.item.nbt.AmmoBoxItemDataAccessor;
-import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
@@ -40,9 +38,11 @@ public class ArsArmsAmmoBoxItemDataAccessor implements AmmoBoxItemDataAccessor {
 
                 if (isFirst) {
                     if (flag00) {
-                        if (flag01) {
-                            if (ammoBoxTag == gunTag) {
+                        if (flag01 && ammoBoxTag != null) {
+                            if (ammoBoxTag.equals(gunTag)) {
                                 ((ModernKineticGunItemAccess) iGun).setReloadAmoData(gun, true);
+                            } else {
+                                return false;
                             }
                         } else {
                             ((ModernKineticGunItemAccess) iGun).setReloadAmoData(gun, true);
