@@ -10,7 +10,7 @@
 
 ### **How to Use**
 
-1.  1.  Use the Ars Nouveau enchanting apparatus to apply a **Reactive enchantment** with your desired spell to an **ammo box**.  
+    1.  Use the Ars Nouveau enchanting apparatus to apply a **Reactive enchantment** with your desired spell to an **ammo box**.  
         ⚠️ _Note: This can only be done using the Ars Nouveau enchanting apparatus. Additionally, make sure the spell's starting glyph is set to **Touch**._
         
     2.  Insert ammunition into the ammo box.
