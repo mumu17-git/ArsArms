@@ -52,7 +52,6 @@ public class LocalPlayerDataHolderMixin {
                 if (currentGunItem.getItem() instanceof AbstractGunItem gi && currentGunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
                     ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
                     ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
-                    System.out.println(modernKineticGunItem.getCurrentAmmoCount(currentGunItem)+", "+reloadAmmoData);
                     if (modernKineticGunItem.getCurrentAmmoCount(currentGunItem) <= 0 && reloadAmmoData != null && reloadAmmoData.isArsMode()) {
                         ArsArmsReloadArsModeCancel.cancel(currentGunItem, offhand);
                     }

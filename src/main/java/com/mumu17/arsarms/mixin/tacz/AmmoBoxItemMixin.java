@@ -15,13 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AmmoBoxItemMixin {
     @Inject(method = "lambda$overrideStackedOnOther$0", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/item/AmmoBoxItem;setAmmoCount(Lnet/minecraft/world/item/ItemStack;I)V"), remap = false)
     private void overrideStackedOnOther$0(int boxAmmoCount, ResourceLocation boxAmmoId, Slot slot, ItemStack ammoBox, Player player, CommonAmmoIndex index, CallbackInfo ci) {
-        System.out.println("$0 : "+slot.getSlotIndex());
         ammoBox.getOrCreateTag().putInt("LastAmmoStackSize", index.getStackSize());
     }
 
     @Inject(method = "lambda$overrideStackedOnOther$1", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/item/AmmoBoxItem;setAmmoCount(Lnet/minecraft/world/item/ItemStack;I)V"), remap = false)
     private void overrideStackedOnOther$1(ItemStack ammoBox, Slot slot, ItemStack slotItem, Player player, CommonAmmoIndex index, CallbackInfo ci) {
-        System.out.println("$1 : "+slot.getSlotIndex());
         ammoBox.getOrCreateTag().putInt("LastAmmoStackSize", index.getStackSize());
     }
 }

@@ -94,7 +94,6 @@ public class EntityKineticBulletMixin {
                             ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(gunItem);
                             if (reloadAmmoData != null) {
                                 boolean isArsMode = reloadAmmoData.isArsMode();
-                                System.out.println(isArsMode);
                                 if (isArsMode) {
                                     explosionDamage *= ArsArmsConfig.COMMON.damageMultiplier.get();
                                 }
