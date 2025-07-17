@@ -10,14 +10,14 @@
 
 ### **How to Use**
 
-    1.  Use the Ars Nouveau enchanting apparatus to apply a **Reactive enchantment** with your desired spell to an **ammo box** .  
-        ⚠️ _ Note: This can only be done using the Ars Nouveau enchanting apparatus. Additionally, make sure the spell's starting glyph is set to **Touch** . _
+1.  Use the Ars Nouveau enchanting apparatus to apply a **Reactive enchantment** with your desired spell to an **ammo box** .  
+        ⚠️ _Note: This can only be done using the Ars Nouveau enchanting apparatus. Additionally, make sure the spell's starting glyph is set to **Touch**._
+
+2.  Insert ammunition into the ammo box.
         
-    2.  Insert ammunition into the ammo box.
+3.  Hold the ammo box in your off-hand to begin charging it with mana.
         
-    3.  Hold the ammo box in your off-hand to begin charging it with mana.
-        
-    4.  While holding the ammo box in your off-hand, reload your gun. The gun will switch to **magic mode**, allowing it to cast spells.
+4.  While holding the ammo box in your off-hand, reload your gun. The gun will switch to **magic mode**, allowing it to cast spells.
         
 
 ### **Notes**
