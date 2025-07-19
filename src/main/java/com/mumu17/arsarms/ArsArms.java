@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 public class ArsArms {
 
     public static final String MODID = "arsarms";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public ArsArms() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ArsArmsConfig.COMMON_SPEC);

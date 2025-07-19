@@ -1,12 +1,7 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.hollingsworth.arsnouveau.common.enchantment.ReactiveEnchantment;
-import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
-import com.mumu17.arsarms.util.GunItemCooldown;
-import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
+import com.mumu17.arsarms.util.*;
 import com.tacz.guns.api.TimelessAPI;
-import com.tacz.guns.api.item.IAmmo;
-import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.shooter.ShooterDataHolder;
 import com.tacz.guns.item.ModernKineticGunItem;
@@ -17,19 +12,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 @Mixin(ModernKineticGunItem.class)
@@ -47,8 +37,8 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
 
     @Unique
     @Override
-    public ArsArmsReloadAmmoData getReloadAmoData(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+    public ArsArmsReloadAmmoData getReloadAmoData(ItemStack gun) {
+        CompoundTag tag = gun.getTag();
         if (tag != null && tag.contains("ArsArmsIsArsMode")) {
             boolean isArsMode = tag.getBoolean("ArsArmsIsArsMode");
             return new ArsArmsReloadAmmoData(isArsMode);
@@ -112,12 +102,14 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
         if (gunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
             boolean useInventoryAmmo = modernKineticGunItem.useInventoryAmmo(gunItem);
             if(shooter instanceof Player player) {
+                PlayerAmmoConsumer.setPlayer(player);
+                PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(gunItem)).orElse(null);
                 if (index != null) {
                     GunData gunData = index.getGunData();
                     if (gunData != null) {
                         if (gunItem.getItem() instanceof IGun iGun) {
-                            int ammoCount = useInventoryAmmo ? handleInventoryAmmo(gunItem, player.getInventory()) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                            int ammoCount = useInventoryAmmo ? ArsArmsAmmoUtil.handleInventoryAmmo(gunItem, player.getInventory()) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                             iGun.getCurrentAmmoCount(gunItem) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                             // if (ammoCount <= 1) {
@@ -153,25 +145,6 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
                 }
             }
         }
-    }
-
-    @Unique
-    private int handleInventoryAmmo(ItemStack stack, Inventory inventory) {
-        int cacheInventoryAmmoCount = 0;
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack inventoryItem = inventory.getItem(i);
-            if (inventoryItem.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(stack, inventoryItem)) {
-                cacheInventoryAmmoCount += inventoryItem.getCount();
-            }
-            if (inventoryItem.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryItem)) {
-                if (iAmmoBox.isAllTypeCreative(inventoryItem) || iAmmoBox.isCreative(inventoryItem)) {
-                    cacheInventoryAmmoCount = 9999;
-                    return cacheInventoryAmmoCount;
-                }
-                cacheInventoryAmmoCount += iAmmoBox.getAmmoCount(inventoryItem);
-            }
-        }
-        return cacheInventoryAmmoCount;
     }
 
 }

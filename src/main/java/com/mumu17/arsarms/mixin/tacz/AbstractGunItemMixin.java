@@ -42,7 +42,7 @@ public class AbstractGunItemMixin {
     }
 
     @ModifyExpressionValue(method = "findAndExtractInventoryAmmo", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IAmmo;isAmmoOfGun(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"), remap = false)
-    public boolean findAndExtractInventoryAmmo(boolean original, @Local(name = "gunItem") ItemStack gunItem, @Local(name = "checkAmmoStack") ItemStack checkAmmoStack) {
+    public boolean findAndExtractInventoryAmmo(boolean original, @Local(name = "gunItem") ItemStack gunItem, @Local(name = "checkAmmoStack") ItemStack checkAmmoStack, @Local(name = "cnt")int cnt, @Local(name = "needAmmoCount")int needAmmoCount) {
         ArsArmsAmmoItemDataAccessor accessor = new ArsArmsAmmoItemDataAccessor();
         return accessor.isAmmoOfGun(gunItem, checkAmmoStack);
     }
@@ -50,6 +50,19 @@ public class AbstractGunItemMixin {
     @ModifyExpressionValue(method = "findAndExtractInventoryAmmo", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IAmmoBox;isAmmoBoxOfGun(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"), remap = false)
     public boolean findAndExtractInventoryAmmo(boolean original, @Local(name = "iAmmoBox") IAmmoBox iAmmoBox, @Local(name = "gunItem") ItemStack gunItem, @Local(name = "checkAmmoStack") ItemStack checkAmmoStack, @Local(name = "cnt")int cnt, @Local(name = "needAmmoCount")int needAmmoCount) {
         ArsArmsAmmoBoxItemDataAccessor accessor = new ArsArmsAmmoBoxItemDataAccessor();
-        return accessor.isAmmoBoxOfGun(gunItem, checkAmmoStack, cnt == needAmmoCount);
+        return accessor.isAmmoBoxOfGun(gunItem, checkAmmoStack);
     }
+
+    @ModifyExpressionValue(method = "lambda$hasInventoryAmmo$6", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IAmmo;isAmmoOfGun(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"), remap = false)
+    private static boolean hasInventoryAmmo(boolean original, @Local(name = "gun") ItemStack gunItem, @Local(name = "checkAmmoStack") ItemStack checkAmmoStack) {
+        ArsArmsAmmoItemDataAccessor accessor = new ArsArmsAmmoItemDataAccessor();
+        return accessor.isAmmoOfGun(gunItem, checkAmmoStack);
+    }
+
+    @ModifyExpressionValue(method = "lambda$hasInventoryAmmo$6", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IAmmoBox;isAmmoBoxOfGun(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"), remap = false)
+    private static boolean hasInventoryAmmoBox(boolean original, @Local(name = "gun") ItemStack gunItem, @Local(name = "checkAmmoStack") ItemStack checkAmmoStack) {
+        ArsArmsAmmoBoxItemDataAccessor accessor = new ArsArmsAmmoBoxItemDataAccessor();
+        return accessor.isAmmoBoxOfGun(gunItem, checkAmmoStack);
+    }
+
 }

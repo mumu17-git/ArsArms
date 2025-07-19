@@ -4,19 +4,16 @@ import com.hollingsworth.arsnouveau.api.spell.Spell;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
-import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
 public class ArsArmsReloadArsModeActive {
-    public static void active(ItemStack currentGunItem, ItemStack offhand) {
-        ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) currentGunItem.getItem();
-        ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
+    public static void active(ItemStack currentGunItem, ItemStack offhand, boolean expendMana) {
+        // ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
+        boolean flag00 = false;
         if (offhand.getItem() instanceof AmmoBoxItem) {
-            boolean flag00 = false;
-
             if (offhand.hasTag() && offhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 Tag ammoBoxTag = offhand.getOrCreateTag().get("ars_nouveau:reactive_caster");
                 if (offhand.getOrCreateTag().contains("Enchantments")) {
@@ -35,7 +32,6 @@ public class ArsArmsReloadArsModeActive {
                                             String enchantmentIdGunItem = enchantmentTagGunItem.getString("id");
                                             if ("ars_nouveau:reactive".equals(enchantmentIdGunItem)) {
                                                 enchantmentsGunItem.remove(j);
-                                                currentGunItem.getOrCreateTag().put("Enchantments", enchantmentsGunItem);
                                                 break;
                                             }
                                         }
@@ -53,19 +49,22 @@ public class ArsArmsReloadArsModeActive {
                     currentGunItem.getOrCreateTag().put("ars_nouveau:reactive_caster", ammoBoxTag);
                 }
 
-                int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(offhand);
-                ReactiveCaster casterData = new ReactiveCaster(offhand);
-                Spell spell = casterData.getSpell();
+                if (expendMana) {
+                    int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(offhand);
+                    ReactiveCaster casterData = new ReactiveCaster(offhand);
+                    Spell spell = casterData.getSpell();
 
-                int cost = spell.getCost();
+                    int cost = spell.getCost();
 
-                int reloadAmmoCount = 0;
-                if (currentGunItem.getItem() instanceof ModernKineticGunItem) {
-                    reloadAmmoCount = 1;
+                    int reloadAmmoCount = 0;
+                    if (currentGunItem.getItem() instanceof ModernKineticGunItem) {
+                        reloadAmmoCount = 1;
+                    }
+                    offhand.getOrCreateTag().putInt("Mana", chargedManaCount - cost * reloadAmmoCount);
                 }
-                offhand.getOrCreateTag().putInt("Mana", chargedManaCount - cost * reloadAmmoCount);
             }
-            access.setReloadAmoData(currentGunItem, flag00);
         }
+        ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) currentGunItem.getItem();
+        access.setReloadAmoData(currentGunItem, flag00);
     }
 }

@@ -12,7 +12,7 @@ public class ArsArmsAmmoBoxItemDataAccessorMixin {
 
     @Inject(method = "isAmmoBoxOfGun", at = @At("RETURN"), remap = false)
     private void isAmmoBoxOfGun(CallbackInfoReturnable<Boolean> cir) {
-        PlayerAmmoConsumer.clearOffhand();
+
     }
 
 }

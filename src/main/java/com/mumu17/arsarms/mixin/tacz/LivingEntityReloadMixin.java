@@ -1,20 +1,12 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.hollingsworth.arsnouveau.api.spell.Spell;
-import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.util.*;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.entity.shooter.LivingEntityReload;
 import com.tacz.guns.item.AmmoBoxItem;
-import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.Bolt;
-import com.tacz.guns.util.AttachmentDataUtils;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -37,8 +29,8 @@ public class LivingEntityReloadMixin {
             ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) currentGunItem.getItem();
             ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
             if (offhand.getItem() instanceof AmmoBoxItem ammoBoxItem) {
-                ArsArmsReloadArsModeActive.active(currentGunItem, offhand);
                 PlayerAmmoConsumer.setOffhand(player.getOffhandItem());
+                ArsArmsReloadArsModeActive.active(currentGunItem, offhand, true);
             }
         }
         return original;

@@ -14,11 +14,13 @@
     "tacz.AbstractGunItemMixin",
     "tacz.AmmoBoxItemMixin",
     "tacz.EntityKineticBulletMixin",
+    "tacz.GunItemBuilderMixin",
     "tacz.LivingEntityReloadMixin",
     "tacz.LivingEntityShootMixin",
     "tacz.ModernKineticGunItemMixin",
     "tacz.ModernKineticGunScriptAPIMixin",
     "tacz.ProjectileExplosionMixin",
+    "tacz.client.GunHudOverlayMixin",
     "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "client": [

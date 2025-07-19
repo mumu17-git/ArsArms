@@ -1,5 +1,7 @@
 package com.mumu17.arsarms.util;
 
+import net.minecraft.world.item.ItemStack;
+
 public class ArsArmsReloadAmmoData {
 
     private final boolean isArsMode;
@@ -11,6 +13,5 @@ public class ArsArmsReloadAmmoData {
     public boolean isArsMode() {
         return isArsMode;
     }
-
 
 }

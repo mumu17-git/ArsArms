@@ -1,26 +1,17 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.hollingsworth.arsnouveau.api.spell.*;
-import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.mumu17.arsarms.util.*;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.ShootResult;
-import com.tacz.guns.api.item.IAmmo;
-import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.entity.shooter.LivingEntityShoot;
 import com.tacz.guns.entity.shooter.ShooterDataHolder;
-import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
@@ -47,10 +38,13 @@ public class LivingEntityShootMixin {
         if (this.data.currentGunItem != null) {
             ItemStack currentGunItem = this.data.currentGunItem.get();
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
+                if( shooter instanceof Player player)
+                    PlayerAmmoConsumer.setPlayer(player);
+                PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
                     if (shooter instanceof Player player) {
                         ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
-                        ArsArmsReloadArsModeActive.active(currentGunItem, offhand);
+                        ArsArmsReloadArsModeActive.active(currentGunItem, offhand, true);
                     }
                 }
 
@@ -61,7 +55,7 @@ public class LivingEntityShootMixin {
                     CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(this.data.currentGunItem.get())).orElse(null);
                     if (index != null) {
                         GunData gunData = index.getGunData();
-                        int ammoCount = gunItem.useInventoryAmmo(this.data.currentGunItem.get()) ? handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (modernKineticGunItem.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                        int ammoCount = gunItem.useInventoryAmmo(currentGunItem) ? ArsArmsAmmoUtil.handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (modernKineticGunItem.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                 modernKineticGunItem.getCurrentAmmoCount(this.data.currentGunItem.get()) + (modernKineticGunItem.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                         ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                         gunItemCooldown.setLastTimestamp(this.data.currentGunItem.get(), nowTime);
@@ -72,28 +66,11 @@ public class LivingEntityShootMixin {
         }
     }
 
-    @Unique
-    private int handleInventoryAmmo(ItemStack stack, Inventory inventory) {
-        int cacheInventoryAmmoCount = 0;
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack inventoryItem = inventory.getItem(i);
-            if (inventoryItem.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(stack, inventoryItem)) {
-                cacheInventoryAmmoCount += inventoryItem.getCount();
-            }
-            if (inventoryItem.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryItem)) {
-                if (iAmmoBox.isAllTypeCreative(inventoryItem) || iAmmoBox.isCreative(inventoryItem)) {
-                    cacheInventoryAmmoCount = 9999;
-                    return cacheInventoryAmmoCount;
-                }
-                cacheInventoryAmmoCount += iAmmoBox.getAmmoCount(inventoryItem);
-            }
-        }
-        return cacheInventoryAmmoCount;
-    }
-
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
     public void consumeAmmoFromPlayer(CallbackInfo ci) {
+        if( shooter instanceof Player player)
+          PlayerAmmoConsumer.setPlayer(player);
         PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
     }
 
