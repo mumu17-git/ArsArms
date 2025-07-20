@@ -2,7 +2,6 @@ package com.mumu17.arsarms.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
-import com.mumu17.arsarms.util.ArsArmsProjectileData;
 import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
 import com.tacz.guns.item.ModernKineticGunItem;

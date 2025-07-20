@@ -4,6 +4,9 @@ buildscript {
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         maven { url = "https://cursemaven.com" }
         mavenCentral()
+        flatDir {
+            dir 'libs'
+        }
     }
     dependencies {
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7.+'
@@ -139,9 +142,9 @@ repositories {
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    flatDir {
+        dir 'libs'
+    }
     maven { url = "https://cursemaven.com" }
 
 }
@@ -162,6 +165,8 @@ dependencies {
     implementation fg.deobf("curse.maven:ars-nouveau-401955:${ars_nouveau_version_cf_id}")
     implementation fg.deobf("curse.maven:curios-309927:${curios_version_cf_id}")
     compileOnly fg.deobf("curse.maven:geckolib-388172:${geckolib_version_cf_id}")
+
+    implementation fg.deobf("curse.maven:castlib-1310383:${cast_lib_version_cf_id}")
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version_cf_id}")
     runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6608233")
@@ -199,7 +204,7 @@ tasks.named('processResources', ProcessResources).configure {
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
-            tacz_version: tacz_version, ars_nouveau_version: ars_nouveau_version,
+            tacz_version: tacz_version, ars_nouveau_version: ars_nouveau_version, castlib_version: castlib_version,
     ]
 
     inputs.properties replaceProperties

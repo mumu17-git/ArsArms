@@ -1,34 +1,22 @@
 package com.mumu17.arsarms.mixin.tacz.client;
 
-import com.hollingsworth.arsnouveau.api.spell.Spell;
-import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.util.*;
 import com.tacz.guns.api.TimelessAPI;
-import com.tacz.guns.api.entity.ReloadState;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.client.gameplay.LocalPlayerDataHolder;
-import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
-import com.tacz.guns.util.AttachmentDataUtils;
-import jdk.jfr.Name;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.InteractionHand;
+import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LocalPlayerDataHolder.class)
 public class LocalPlayerDataHolderMixin {
@@ -42,6 +30,9 @@ public class LocalPlayerDataHolderMixin {
     @Unique
     private ItemStack offhand = ItemStack.EMPTY;
 
+    @Unique
+    private final int MAX_AMMO_COUNT = 9999;
+
     @Inject(method = "tickStateLock", at = @At(value = "FIELD", target = "Lcom/tacz/guns/client/gameplay/LocalPlayerDataHolder;clientStateLock:Z"), remap = false)
     private void tickStateLock(CallbackInfo ci) {
         if (this.clientStateLock) {
@@ -52,8 +43,20 @@ public class LocalPlayerDataHolderMixin {
                 if (currentGunItem.getItem() instanceof AbstractGunItem gi && currentGunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
                     ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
                     ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
-                    if (modernKineticGunItem.getCurrentAmmoCount(currentGunItem) <= 0 && reloadAmmoData != null && reloadAmmoData.isArsMode()) {
-                        ArsArmsReloadArsModeCancel.cancel(currentGunItem, offhand);
+                    boolean useInventoryAmmo = modernKineticGunItem.useInventoryAmmo(currentGunItem);
+                    CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(currentGunItem)).orElse(null);
+                    if (index != null) {
+                        GunData gunData = index.getGunData();
+                        if (gunData != null) {
+                            if (currentGunItem.getItem() instanceof IGun iGun) {
+                                int ammoCount = useInventoryAmmo ? ArsArmsAmmoUtil.handleInventoryAmmo(currentGunItem, player.getInventory()) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                        iGun.getCurrentAmmoCount(currentGunItem) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                                ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
+                                if (ammoCount <= 0 && reloadAmmoData != null && reloadAmmoData.isArsMode()) {
+                                    ArsArmsReloadArsModeCancel.cancel(currentGunItem, offhand);
+                                }
+                            }
+                        }
                     }
                 }
             }

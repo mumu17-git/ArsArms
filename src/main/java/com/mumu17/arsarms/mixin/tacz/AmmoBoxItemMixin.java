@@ -1,6 +1,5 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.tacz.guns.api.item.nbt.AmmoBoxItemDataAccessor;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import net.minecraft.resources.ResourceLocation;
@@ -8,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.SoftOverride;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;

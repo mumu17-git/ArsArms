@@ -22,9 +22,6 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = ArsArms.MODID, value = Dist.CLIENT)
 public class ChargeManaToAmmoBoxTick {
-
-    private static int lastSelectedSlot = -1;
-    private static boolean lastIsOffhandAmmoBox = false;
     private static final int MAX_AMMO_COUNT = 9999;
 
     @SubscribeEvent

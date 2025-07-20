@@ -7,9 +7,6 @@
   "mixins": [
     "EntityHitResultMixin",
     "LivingEntityMixin",
-    "ars.MethodTouchMixin",
-    "ars.SpellResolverMixin",
-    "ars.SpellUtilMixin",
     "arsarms.ArsArmsAmmoBoxItemDataAccessorMixin",
     "tacz.AbstractGunItemMixin",
     "tacz.AmmoBoxItemMixin",
