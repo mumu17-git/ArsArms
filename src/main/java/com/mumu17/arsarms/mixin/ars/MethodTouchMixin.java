@@ -65,9 +65,6 @@ public class MethodTouchMixin {
                     for (AbstractSpellPart part : original.spell.recipe) {
                         if (!(part.getGlyph().spellPart instanceof AbstractAugment)) {
                             modified_parts.add(part);
-                            /*for (int i = 0; i < damageMultiply;i++) {
-                                modified_parts.add(GlyphRegistry.getSpellPart(new ResourceLocation("ars_nouveau", GlyphLib.AugmentAmplifyID)));
-                            }*/
                         } else {
                             modified_parts.add(part);
                         }
@@ -110,9 +107,6 @@ public class MethodTouchMixin {
                     for (AbstractSpellPart part : original.spell.recipe) {
                         if (!(part.getGlyph().spellPart instanceof AbstractAugment)) {
                             modified_parts.add(part);
-                            /*for (int i = 0; i < damageMultiply;i++) {
-                                modified_parts.add(GlyphRegistry.getSpellPart(new ResourceLocation("ars_nouveau", GlyphLib.AugmentAmplifyID)));
-                            }*/
                         } else {
                             modified_parts.add(part);
                         }
