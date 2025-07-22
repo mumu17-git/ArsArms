@@ -29,7 +29,7 @@ public class ChargeManaToAmmoBoxTick {
         if (event.phase == TickEvent.ClientTickEvent.Phase.END) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
-                PlayerAmmoConsumer.setPlayer(mc.player);
+                // PlayerAmmoConsumer.setPlayer(mc.player);
                 ItemStack offhand = mc.player.getOffhandItem();
                 if (isTargetItem(offhand)) {
                     chargeManaOrCancel(mc.player);

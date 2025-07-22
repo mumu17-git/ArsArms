@@ -9,8 +9,10 @@ import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,6 +25,9 @@ public class LocalPlayerDataHolderMixin {
 
     @Shadow(remap = false)
     public volatile boolean clientStateLock;
+    @Final
+    @Shadow(remap = false)
+    private LocalPlayer player;
 
     @Unique
     private ItemStack currentGunItem = ItemStack.EMPTY;
@@ -36,7 +41,6 @@ public class LocalPlayerDataHolderMixin {
     @Inject(method = "tickStateLock", at = @At(value = "FIELD", target = "Lcom/tacz/guns/client/gameplay/LocalPlayerDataHolder;clientStateLock:Z"), remap = false)
     private void tickStateLock(CallbackInfo ci) {
         if (this.clientStateLock) {
-            Player player = PlayerAmmoConsumer.getPlayer();
             if (player != null) {
                 currentGunItem = player.getMainHandItem();
                 offhand = player.getOffhandItem();

@@ -27,7 +27,7 @@ public class GuiGraphicsMixin {
         if (ArsArms$isAmmoBox(itemStack)) {
             Minecraft mc = minecraft;
             Player player = mc.player;
-            PlayerAmmoConsumer.setPlayer(player);
+            // PlayerAmmoConsumer.setPlayer(player);
             int value = ArsArmsAmmoBox.getChargedManaCount(itemStack);
             int max = ArsArmsAmmoBox.getMaxManaCount(itemStack);
             if (max > 0) {

@@ -11,6 +11,7 @@
     "tacz.AbstractGunItemMixin",
     "tacz.AmmoBoxItemMixin",
     "tacz.EntityKineticBulletMixin",
+    "tacz.EntityUtilMixin",
     "tacz.GunItemBuilderMixin",
     "tacz.LivingEntityReloadMixin",
     "tacz.LivingEntityShootMixin",

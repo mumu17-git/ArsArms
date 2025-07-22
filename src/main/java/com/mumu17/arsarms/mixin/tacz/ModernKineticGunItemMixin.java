@@ -102,7 +102,7 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
         if (gunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
             boolean useInventoryAmmo = modernKineticGunItem.useInventoryAmmo(gunItem);
             if(shooter instanceof Player player) {
-                PlayerAmmoConsumer.setPlayer(player);
+                // PlayerAmmoConsumer.setPlayer(player);
                 PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(gunItem)).orElse(null);
                 if (index != null) {

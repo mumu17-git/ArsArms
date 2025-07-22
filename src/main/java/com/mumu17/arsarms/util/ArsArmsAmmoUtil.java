@@ -1,5 +1,7 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
+import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
@@ -9,6 +11,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.util.LazyOptional;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Objects;
 
@@ -16,8 +21,25 @@ public class ArsArmsAmmoUtil {
 
     public static int handleInventoryAmmo(ItemStack stack, Inventory inventory) {
         int cacheInventoryAmmoCount = 0;
+
+        for (int i = 0; i < ExtendedHand.values().length; i++) {
+            LazyOptional<ICuriosItemHandler> curiosItemHandlerLazyOptional = CuriosApi.getCuriosInventory(inventory.player);
+            ICuriosItemHandler curiosItemHandler = curiosItemHandlerLazyOptional.orElse(null);
+            cacheInventoryAmmoCount = handleInventoryAmmo(stack, null, curiosItemHandler, ExtendedHand.values()[i].getSlotName(), cacheInventoryAmmoCount, i);
+        }
+
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack inventoryItem = inventory.getItem(i);
+            cacheInventoryAmmoCount = handleInventoryAmmo(stack, inventory, null, null, cacheInventoryAmmoCount, i);
+            if (cacheInventoryAmmoCount >= 9999) {
+                break;
+            }
+        }
+        return cacheInventoryAmmoCount;
+    }
+
+    public static int handleInventoryAmmo(ItemStack stack, Inventory inventory, ICuriosItemHandler curiosItemHandler, String curiosSlot, int cacheInventoryAmmoCount, int i) {
+        if (!(inventory != null && curiosSlot != null && !ExtendedHand.getSlotByName(curiosSlot).isCurios())) {
+            ItemStack inventoryItem = (inventory != null ? inventory.getItem(i) : (curiosItemHandler.getCurios().containsKey(curiosSlot) ? curiosItemHandler.getCurios().get(curiosSlot).getStacks().getStackInSlot(0) : ItemStack.EMPTY));
             if (inventoryItem.getItem() instanceof IAmmo iAmmo) {
                 ArsArmsAmmoItemDataAccessor accessor = new ArsArmsAmmoItemDataAccessor();
                 if (accessor.isAmmoOfGun(stack, inventoryItem)) {
@@ -32,10 +54,10 @@ public class ArsArmsAmmoUtil {
                         return cacheInventoryAmmoCount;
                     }
                     cacheInventoryAmmoCount += iAmmoBox.getAmmoCount(inventoryItem);
-
                 }
             }
         }
+
         return cacheInventoryAmmoCount;
     }
 

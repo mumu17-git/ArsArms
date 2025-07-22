@@ -34,7 +34,7 @@ public class LivingEntityMixin {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity instanceof Player player) {
             ItemStack mainhand = player.getMainHandItem();
-            PlayerAmmoConsumer.setPlayer(player);
+            // PlayerAmmoConsumer.setPlayer(player);
             PlayerAmmoConsumer.setOffhand(player.getOffhandItem());
             if (mainhand.getItem() instanceof AbstractGunItem gunItem) {
                 if (gunItem.useInventoryAmmo(mainhand)) {
