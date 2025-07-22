@@ -39,7 +39,7 @@ public class LivingEntityShootMixin {
             ItemStack currentGunItem = this.data.currentGunItem.get();
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
                 if( shooter instanceof Player player)
-                    PlayerAmmoConsumer.setPlayer(player);
+                    // PlayerAmmoConsumer.setPlayer(player);
                 PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
                     if (shooter instanceof Player player) {
@@ -70,7 +70,7 @@ public class LivingEntityShootMixin {
     @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
     public void consumeAmmoFromPlayer(CallbackInfo ci) {
         if( shooter instanceof Player player)
-          PlayerAmmoConsumer.setPlayer(player);
+          // PlayerAmmoConsumer.setPlayer(player);
         PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
     }
 

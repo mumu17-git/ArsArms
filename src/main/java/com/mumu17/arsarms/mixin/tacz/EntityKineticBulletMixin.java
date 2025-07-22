@@ -4,10 +4,12 @@ import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
 import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
 import com.mumu17.arsarms.util.GunItemCooldown;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
+import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.util.TacHitResult;
@@ -49,12 +51,14 @@ public class EntityKineticBulletMixin {
 
     @Inject(method = "onHitEntity", at = @At(value = "HEAD"), remap = false)
     public void onHitEntity(TacHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci) {
-        LivingEntity attacker = ((EntityKineticBullet)(Object)this).getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
+        EntityKineticBullet projectileEntity = ((EntityKineticBullet)(Object)this);
+        LivingEntity attacker = projectileEntity.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
         if (attacker instanceof Player player) {
-            ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
-                ArsArmsProjectileData.set(result.getEntity(), null, InteractionHand.OFF_HAND, mainhand);
+            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
+                ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
+                ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(mainhand);
+                ArsArmsProjectileData.setProjectileData((Entity) projectileEntity, result.getEntity(), null, ArsCuriosLivingEntity.getPlayerExtendedHand(player), reloadAmmoData.isArsMode());
             }
         }
     }
@@ -63,13 +67,11 @@ public class EntityKineticBulletMixin {
     public void onHitEntity(TacHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci, @Local(name = "attacker") LivingEntity attacker) {
         if (attacker != null) {
             Player player = (Player) attacker;
-            ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
             if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 if(result.getEntity().isAlive()) {
                     ArsArms$castSpell(player, mainhand);
                 }
-                ArsArmsProjectileData.clear();
             }
         }
     }
@@ -77,12 +79,14 @@ public class EntityKineticBulletMixin {
     @Inject(method = "onHitEntity", at = @At(value = "FIELD", target = "Lcom/tacz/guns/entity/EntityKineticBullet;explosion:Z", shift = At.Shift.AFTER), remap = false)
     public void explosionDamage(TacHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci) {
         if (explosion) {
-            LivingEntity attacker = ((EntityKineticBullet) (Object) this).getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
+            EntityKineticBullet projectileEntity = ((EntityKineticBullet)(Object)this);
+            LivingEntity attacker = projectileEntity.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
             if (attacker instanceof Player player) {
                 ItemStack gunItem = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (gunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
-                    Entity entity = ArsArmsProjectileData.getTargetEntity();
-                    InteractionHand hand = ArsArmsProjectileData.getHand();
+                ArsArmsProjectileData arsArmsProjectileData = ArsArmsProjectileData.getProjectileData(projectileEntity);
+                if (gunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem && arsArmsProjectileData != null) {
+                    Entity entity = arsArmsProjectileData.getTargetEntity();
+                    InteractionHand hand = arsArmsProjectileData.getHand();
                     if (hand == InteractionHand.OFF_HAND) {
                         if (entity != null) {
                             ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
@@ -102,12 +106,14 @@ public class EntityKineticBulletMixin {
 
     @ModifyReturnValue(method = "getDamage", at = @At(value = "RETURN"), remap = false)
     public float getDamage(float original) {
-        if(ArsArmsProjectileData.isEnabled()) {
-            Entity entity = ArsArmsProjectileData.getTargetEntity();
-            InteractionHand hand = ArsArmsProjectileData.getHand();
+        EntityKineticBullet projectileEntity = ((EntityKineticBullet)(Object)this);
+        ArsArmsProjectileData arsArmsProjectileData = ArsArmsProjectileData.getProjectileData(projectileEntity);
+        if(arsArmsProjectileData != null && arsArmsProjectileData.isEnabled()) {
+            Entity entity = arsArmsProjectileData.getTargetEntity();
+            InteractionHand hand = arsArmsProjectileData.getHand();
             if (hand == InteractionHand.OFF_HAND) {
                 if (entity != null) {
-                    if (((EntityKineticBullet)(Object)this).getOwner() instanceof Player player) {
+                    if (projectileEntity.getOwner() instanceof Player player) {
                         GunItemCooldown gunItemCooldown = (GunItemCooldown) player.getMainHandItem().getItem();
                         gunItemCooldown.setGunDamage(player.getMainHandItem(), original);
                         return (float) (original * ArsArmsConfig.COMMON.damageMultiplier.get());
@@ -120,12 +126,14 @@ public class EntityKineticBulletMixin {
 
     @Inject(method = "onHitBlock", at = @At(value = "HEAD"), remap = false)
     public void onHitBlock_HEAD(BlockHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci) {
-        LivingEntity attacker = ((EntityKineticBullet)(Object)this).getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
+        EntityKineticBullet projectileEntity = ((EntityKineticBullet)(Object)this);
+        LivingEntity attacker = projectileEntity.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
         if (attacker instanceof Player player) {
-            ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
-                ArsArmsProjectileData.set(null, result, InteractionHand.OFF_HAND, mainhand);
+            if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
+                ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) modernKineticGunItem;
+                ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(mainhand);
+                ArsArmsProjectileData.setProjectileData(projectileEntity, null, result, ArsCuriosLivingEntity.getPlayerExtendedHand(player), reloadAmmoData.isArsMode());
             }
         }
     }
@@ -134,13 +142,11 @@ public class EntityKineticBulletMixin {
     public void onHitBlock(BlockHitResult result, Vec3 startVec, Vec3 endVec, CallbackInfo ci) {
         LivingEntity attacker = ((EntityKineticBullet)(Object)this).getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
         if (attacker instanceof Player player) {
-            ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
             ItemStack mainhand = player.getItemInHand(InteractionHand.MAIN_HAND);
             if (mainhand.getItem() instanceof ModernKineticGunItem && mainhand.hasTag() && mainhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                 if (result != null) {
                     ArsArms$castSpell(player, mainhand);
                 }
-                ArsArmsProjectileData.clear();
             }
         }
     }

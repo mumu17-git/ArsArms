@@ -4,19 +4,25 @@ import com.mumu17.arsarms.util.ArsArmsProjectileData;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.EntityHitResult;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityHitResult.class)
 public class EntityHitResultMixin {
+    @Shadow @Final private Entity entity;
+
     @Inject(method = "getEntity", at = @At(value = "HEAD"), cancellable = true)
     public void getEntity(CallbackInfoReturnable<Entity> cir) {
-        if (ArsArmsProjectileData.isEnabled()) {
-            Entity entity = ArsArmsProjectileData.getTargetEntity();
-            InteractionHand hand = ArsArmsProjectileData.getHand();
-            if (hand == InteractionHand.OFF_HAND) {
+        Entity projectile = ArsArmsProjectileData.getProjectileFromEntity(this.entity);
+        ArsArmsProjectileData projectileData = ArsArmsProjectileData.getProjectileData(projectile);
+        if (projectileData != null && projectileData.isEnabled()) {
+            Entity entity = projectileData.getTargetEntity();
+            InteractionHand hand = projectileData.getHand();
+            if (hand == null) { // If hand is null, it means the ExtendedHand is used.
                 if (entity != null) {
                     cir.setReturnValue(entity);
                 }
