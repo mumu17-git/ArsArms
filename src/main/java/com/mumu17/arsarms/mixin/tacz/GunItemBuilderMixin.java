@@ -1,7 +1,7 @@
 package com.mumu17.arsarms.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mumu17.arsarms.util.GunItemCooldown;
+import com.mumu17.arsarms.util.GunItemNbt;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
@@ -33,7 +33,7 @@ public class GunItemBuilderMixin {
     private void addGunTags(IGun iGun, ItemStack gun) {
         ModernKineticGunItemAccess access0 = (ModernKineticGunItemAccess) iGun;
         access0.setReloadAmoData(gun, false);
-        GunItemCooldown access1 = (GunItemCooldown) iGun;
+        GunItemNbt access1 = (GunItemNbt) iGun;
         access1.setLastAmmoCount(gun, ammoCount);
         access1.setGunDamage(gun, 0.0F);
         access1.setLastTimestamp(gun, System.currentTimeMillis());

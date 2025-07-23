@@ -40,7 +40,7 @@ public class LivingEntityShootMixin {
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
                 if( shooter instanceof Player player)
                     // PlayerAmmoConsumer.setPlayer(player);
-                PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
+                    PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
                     if (shooter instanceof Player player) {
                         ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
@@ -49,7 +49,7 @@ public class LivingEntityShootMixin {
                 }
 
                 if (this.data.currentGunItem.get().getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
-                    GunItemCooldown gunItemCooldown = (GunItemCooldown) this.data.currentGunItem.get().getItem();
+                    GunItemNbt gunItemCooldown = (GunItemNbt) this.data.currentGunItem.get().getItem();
                     long nowTime = System.currentTimeMillis();
                     Player player = (Player) this.shooter;
                     CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(this.data.currentGunItem.get())).orElse(null);
@@ -70,8 +70,8 @@ public class LivingEntityShootMixin {
     @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
     public void consumeAmmoFromPlayer(CallbackInfo ci) {
         if( shooter instanceof Player player)
-          // PlayerAmmoConsumer.setPlayer(player);
-        PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
+            // PlayerAmmoConsumer.setPlayer(player);
+            PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
     }
 
 

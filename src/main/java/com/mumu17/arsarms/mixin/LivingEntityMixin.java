@@ -38,7 +38,7 @@ public class LivingEntityMixin {
             PlayerAmmoConsumer.setOffhand(player.getOffhandItem());
             if (mainhand.getItem() instanceof AbstractGunItem gunItem) {
                 if (gunItem.useInventoryAmmo(mainhand)) {
-                    GunItemCooldown gunItemCooldown = (GunItemCooldown) gunItem;
+                    GunItemNbt gunItemCooldown = (GunItemNbt) gunItem;
                     long nowTime = System.currentTimeMillis();
                     long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
                     if (timestamp > 0) {
@@ -46,7 +46,7 @@ public class LivingEntityMixin {
                             // ArsArmsReloadArsModeCancel.removeReactiveFromGun(mainhand, player);
                     }
                 } else {
-                    GunItemCooldown gunItemCooldown = (GunItemCooldown) gunItem;
+                    GunItemNbt gunItemCooldown = (GunItemNbt) gunItem;
                     long nowTime = System.currentTimeMillis();
                     long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
                     if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {

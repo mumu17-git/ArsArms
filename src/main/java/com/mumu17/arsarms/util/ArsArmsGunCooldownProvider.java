@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 public class ArsArmsGunCooldownProvider implements IGunItemCooldownProvider {
     @Override
     public float getGunDamage(ItemStack gunItem) {
-        GunItemCooldown gun = (GunItemCooldown) gunItem.getItem();
+        GunItemNbt gun = (GunItemNbt) gunItem.getItem();
         return gun.getGunDamage(gunItem);
     }
 }

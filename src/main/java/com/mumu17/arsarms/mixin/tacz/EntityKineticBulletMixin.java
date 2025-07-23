@@ -4,10 +4,9 @@ import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
 import com.mumu17.arsarms.util.ArsArmsReloadAmmoData;
-import com.mumu17.arsarms.util.GunItemCooldown;
+import com.mumu17.arsarms.util.GunItemNbt;
 import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.tacz.guns.entity.EntityKineticBullet;
@@ -114,7 +113,7 @@ public class EntityKineticBulletMixin {
             if (hand == InteractionHand.OFF_HAND) {
                 if (entity != null) {
                     if (projectileEntity.getOwner() instanceof Player player) {
-                        GunItemCooldown gunItemCooldown = (GunItemCooldown) player.getMainHandItem().getItem();
+                        GunItemNbt gunItemCooldown = (GunItemNbt) player.getMainHandItem().getItem();
                         gunItemCooldown.setGunDamage(player.getMainHandItem(), original);
                         return (float) (original * ArsArmsConfig.COMMON.damageMultiplier.get());
                     }

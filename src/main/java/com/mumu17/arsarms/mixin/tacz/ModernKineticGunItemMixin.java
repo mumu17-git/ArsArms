@@ -8,22 +8,29 @@ import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @Mixin(ModernKineticGunItem.class)
-public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, GunItemCooldown {
+public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, GunItemNbt {
 
     @Unique
     private static final int MAX_AMMO_COUNT = 9999;
@@ -44,6 +51,34 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
             return new ArsArmsReloadAmmoData(isArsMode);
         }
         return null;
+    }
+
+    @Unique
+    @Override
+    public void setOwner(ItemStack gunItem, LivingEntity owner) {
+        CompoundTag tag = gunItem.getOrCreateTag();
+        if (owner != null) {
+            tag.putUUID("OwnerUUID", owner.getUUID());
+            tag.putString("OwnerDimension", owner.level().dimension().location().toString());
+        }
+    }
+
+    @Unique
+    @Override
+    public LivingEntity getOwner(ItemStack gunItem) {
+        CompoundTag tag = gunItem.getOrCreateTag();
+        if (!tag.hasUUID("OwnerUUID") || !tag.contains("OwnerDimension")) {
+            return null;
+        }
+        String dimId = tag.getString("OwnerDimension");
+        ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimId));
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null)
+            return null;
+        if (server.getLevel(dimension) == null)
+            return null;
+
+        return (LivingEntity) Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID("OwnerUUID"));
     }
 
     @Unique
@@ -95,6 +130,23 @@ public class ModernKineticGunItemMixin implements ModernKineticGunItemAccess, Gu
             return tag.getFloat("LastGunDamage");
         }
         return 0.0F;
+    }
+
+    @Unique
+    @Override
+    public void setReloadedSlot(ItemStack gunItem, String slotName) {
+        CompoundTag tag = gunItem.getOrCreateTag();
+        tag.putString("ReloadedSlot", slotName);
+    }
+
+    @Unique
+    @Override
+    public String getReloadedSlot(ItemStack gunItem) {
+        CompoundTag tag = gunItem.getTag();
+        if (tag != null && tag.contains("ReloadedSlot")) {
+            return tag.getString("ReloadedSlot");
+        }
+        return null;
     }
 
     @Inject(method = "shoot", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Optional;ofNullable(Ljava/lang/Object;)Ljava/util/Optional;"), remap = false)

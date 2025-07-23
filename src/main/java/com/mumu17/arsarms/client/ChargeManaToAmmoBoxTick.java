@@ -29,7 +29,6 @@ public class ChargeManaToAmmoBoxTick {
         if (event.phase == TickEvent.ClientTickEvent.Phase.END) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
-                // PlayerAmmoConsumer.setPlayer(mc.player);
                 ItemStack offhand = mc.player.getOffhandItem();
                 if (isTargetItem(offhand)) {
                     chargeManaOrCancel(mc.player);
@@ -57,6 +56,8 @@ public class ChargeManaToAmmoBoxTick {
                         }
                     }
                     if (stack.getItem() instanceof ModernKineticGunItem gunItem) {
+                        ModernKineticGunItemAccess access0 = (ModernKineticGunItemAccess) gunItem;
+                        access0.setOwner(stack, mc.player);
                         if (gunItem.useInventoryAmmo(stack)) {
                             ArsArmsReloadArsModeCancel.remove(stack, mc.player);
                         }

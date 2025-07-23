@@ -2,7 +2,7 @@ package com.mumu17.arsarms.util;
 
 import net.minecraft.world.item.ItemStack;
 
-public interface GunItemCooldown {
+public interface GunItemNbt {
 
     void setLastTimestamp(ItemStack gunItem, long timestamp);
 
@@ -15,4 +15,8 @@ public interface GunItemCooldown {
     void setGunDamage(ItemStack gunItem, float damage);
 
     float getGunDamage(ItemStack gunItem);
+
+    void setReloadedSlot(ItemStack gunItem, String slotName);
+
+    String getReloadedSlot(ItemStack gunItem);
 }

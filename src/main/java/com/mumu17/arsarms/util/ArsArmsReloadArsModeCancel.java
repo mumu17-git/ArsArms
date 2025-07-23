@@ -1,6 +1,5 @@
 package com.mumu17.arsarms.util;
 
-import com.mumu17.arsarms.ArsArms;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.item.AmmoBoxItem;
@@ -54,7 +53,7 @@ public class ArsArmsReloadArsModeCancel {
                 currentGunItem.getOrCreateTag().remove("ars_nouveau:reactive_caster");
 
                 if (currentGunItem.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
-                    GunItemCooldown gunItemCooldown = (GunItemCooldown) modernKineticGunItem;
+                    GunItemNbt gunItemCooldown = (GunItemNbt) modernKineticGunItem;
                     gunItemCooldown.setLastAmmoCount(currentGunItem, 0);
                 }
             }
