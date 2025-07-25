@@ -1,5 +1,6 @@
 package com.mumu17.arsarms.util;
 
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 public interface GunItemNbt {
@@ -16,7 +17,11 @@ public interface GunItemNbt {
 
     float getGunDamage(ItemStack gunItem);
 
-    void setReloadedSlot(ItemStack gunItem, String slotName);
+    void setIsArsMode(ItemStack gun, boolean isArsMode);
 
-    String getReloadedSlot(ItemStack gunItem);
+    boolean getIsArsMode(ItemStack gun);
+
+    void setOwner(ItemStack gun, LivingEntity owner);
+
+    LivingEntity getOwner(ItemStack gun);
 }

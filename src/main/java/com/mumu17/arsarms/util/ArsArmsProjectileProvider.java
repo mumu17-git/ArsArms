@@ -8,6 +8,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.Optional;
+
 public class ArsArmsProjectileProvider implements IProjectileDataProvider {
     @Override
     public boolean isEnabled(LivingEntity entity) {
@@ -21,7 +23,7 @@ public class ArsArmsProjectileProvider implements IProjectileDataProvider {
 
     @Override
     public InteractionHand getHand(LivingEntity entity) {
-        return getProjectile(entity).getHand();
+        return getProjectile(entity).getHand().getVanillaHand();
     }
 
     @Override

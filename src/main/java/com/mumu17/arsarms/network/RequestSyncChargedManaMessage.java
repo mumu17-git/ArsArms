@@ -1,43 +1,36 @@
 package com.mumu17.arsarms.network;
 
-import com.hollingsworth.arsnouveau.api.spell.Spell;
-import com.hollingsworth.arsnouveau.api.spell.SpellContext;
-import com.hollingsworth.arsnouveau.api.spell.SpellResolver;
-import com.hollingsworth.arsnouveau.api.util.ManaUtil;
-import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
-import com.mumu17.arsarms.util.PlayerAmmoConsumer;
+import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class RequestSyncChargedManaMessage {
     private final int manaCount;
-    private final int ammoBox;
+    private final String curiosSlot;
 
-    public RequestSyncChargedManaMessage(int ManaCount, int stack) {
+    public RequestSyncChargedManaMessage(int ManaCount, String cs) {
         this.manaCount = ManaCount;
-        this.ammoBox = stack;
+        this.curiosSlot = cs;
     }
 
     public static void encode(RequestSyncChargedManaMessage msg, FriendlyByteBuf buf) {
         buf.writeInt(msg.manaCount);
-        buf.writeInt(msg.ammoBox);
+        buf.writeUtf(msg.curiosSlot);
     }
 
     public static RequestSyncChargedManaMessage decode(FriendlyByteBuf buf) {
-        return new RequestSyncChargedManaMessage(buf.readInt(), buf.readInt());
+        return new RequestSyncChargedManaMessage(buf.readInt(), buf.readUtf());
     }
 
     public static void handle(RequestSyncChargedManaMessage msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             var player = ctx.get().getSender();
             if (player != null) {
-                var stack = player.getInventory().getItem(msg.ammoBox);
+                var stack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, msg.curiosSlot);
                 if (!stack.isEmpty() && stack.getItem() instanceof AmmoBoxItem) {
                     int chargedManaCount = stack.getOrCreateTag().getInt("Mana");
                     double removeManaCount = ((double) msg.manaCount - (double) chargedManaCount);

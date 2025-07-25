@@ -5,15 +5,14 @@ import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.item.AmmoBoxItem;
+import com.tacz.guns.item.AmmoItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Objects;
 
@@ -23,13 +22,16 @@ public class ArsArmsAmmoUtil {
         int cacheInventoryAmmoCount = 0;
 
         for (int i = 0; i < ExtendedHand.values().length; i++) {
-            LazyOptional<ICuriosItemHandler> curiosItemHandlerLazyOptional = CuriosApi.getCuriosInventory(inventory.player);
-            ICuriosItemHandler curiosItemHandler = curiosItemHandlerLazyOptional.orElse(null);
-            cacheInventoryAmmoCount = handleInventoryAmmo(stack, null, curiosItemHandler, ExtendedHand.values()[i].getSlotName(), cacheInventoryAmmoCount, i);
+            ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(inventory.player, ExtendedHand.values()[i].getSlotName());
+            int tmp = handleInventoryAmmo(stack, null, curiosStack, cacheInventoryAmmoCount, -1);
+            if (tmp != cacheInventoryAmmoCount) {
+                cacheInventoryAmmoCount = tmp;
+                break;
+            }
         }
 
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            cacheInventoryAmmoCount = handleInventoryAmmo(stack, inventory, null, null, cacheInventoryAmmoCount, i);
+            cacheInventoryAmmoCount = handleInventoryAmmo(stack, inventory, null, cacheInventoryAmmoCount, i);
             if (cacheInventoryAmmoCount >= 9999) {
                 break;
             }
@@ -37,18 +39,16 @@ public class ArsArmsAmmoUtil {
         return cacheInventoryAmmoCount;
     }
 
-    public static int handleInventoryAmmo(ItemStack stack, Inventory inventory, ICuriosItemHandler curiosItemHandler, String curiosSlot, int cacheInventoryAmmoCount, int i) {
-        if (!(inventory != null && curiosSlot != null && !ExtendedHand.getSlotByName(curiosSlot).isCurios())) {
-            ItemStack inventoryItem = (inventory != null ? inventory.getItem(i) : (curiosItemHandler.getCurios().containsKey(curiosSlot) ? curiosItemHandler.getCurios().get(curiosSlot).getStacks().getStackInSlot(0) : ItemStack.EMPTY));
-            if (inventoryItem.getItem() instanceof IAmmo iAmmo) {
-                ArsArmsAmmoItemDataAccessor accessor = new ArsArmsAmmoItemDataAccessor();
-                if (accessor.isAmmoOfGun(stack, inventoryItem)) {
+    public static int handleInventoryAmmo(ItemStack stack, Inventory inventory, ItemStack curiosStack, int cacheInventoryAmmoCount, int i) {
+        if ((inventory != null) || (curiosStack != null)) {
+            ItemStack inventoryItem = (inventory != null ? inventory.getItem(i) : curiosStack);
+            if (inventoryItem.getItem() instanceof AmmoItem iAmmo) {
+                if (iAmmo.isAmmoOfGun(stack, inventoryItem)) {
                     cacheInventoryAmmoCount += inventoryItem.getCount();
                 }
             }
-            if (inventoryItem.getItem() instanceof IAmmoBox iAmmoBox) {
-                ArsArmsAmmoBoxItemDataAccessor accessor = new ArsArmsAmmoBoxItemDataAccessor();
-                if (accessor.isAmmoBoxOfGun(stack, inventoryItem)) {
+            if (inventoryItem.getItem() instanceof AmmoBoxItem iAmmoBox) {
+                if (iAmmoBox.isAmmoBoxOfGun(stack, inventoryItem)) {
                     if (iAmmoBox.isAllTypeCreative(inventoryItem) || iAmmoBox.isCreative(inventoryItem)) {
                         cacheInventoryAmmoCount = 9999;
                         return cacheInventoryAmmoCount;
@@ -110,23 +110,20 @@ public class ArsArmsAmmoUtil {
                         if (flag01 && ammoBoxTag != null) {
                             if (ammoBoxTag.equals(gunTag)) {
                                 if (!checkOnly) {
-                                    ((ModernKineticGunItemAccess) iGun).setReloadAmoData(gun, true);
+                                    ((GunItemNbt) iGun).setIsArsMode(gun, true);
                                 }
                             } else {
                                 return false;
                             }
                         } else {
                             if (!checkOnly) {
-                                ((ModernKineticGunItemAccess) iGun).setReloadAmoData(gun, true);
+                                ((GunItemNbt) iGun).setIsArsMode(gun, true);
                             }
                         }
                     }
                 } else {
-                    ArsArmsReloadAmmoData reloadAmmoData = ((ModernKineticGunItemAccess) iGun).getReloadAmoData(gun);
-                    if (reloadAmmoData != null) {
-                        if (flag00 != reloadAmmoData.isArsMode()) {
-                            return false;
-                        }
+                    if (flag00 != ((GunItemNbt) iGun).getIsArsMode(gun)) {
+                        return false;
                     }
                     if (flag01) {
                         if (!Objects.requireNonNull(ammoBoxTag).equals(gunTag)) {
@@ -135,14 +132,8 @@ public class ArsArmsAmmoUtil {
                     }
                 }
                 return true;
-            } else if (var5 instanceof IAmmo iAmmo) {
-                ArsArmsReloadAmmoData reloadAmmoData = ((ModernKineticGunItemAccess) iGun).getReloadAmoData(gun);
-                if (reloadAmmoData != null) {
-                    if (reloadAmmoData.isArsMode()) {
-                        return false;
-                    }
-                }
-                return true;
+            } else if (var5 instanceof IAmmo) {
+                return !((GunItemNbt) iGun).getIsArsMode(gun);
             }
         }
         return false;

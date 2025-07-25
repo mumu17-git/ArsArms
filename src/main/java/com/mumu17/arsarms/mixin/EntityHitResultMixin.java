@@ -1,7 +1,7 @@
 package com.mumu17.arsarms.mixin;
 
 import com.mumu17.arsarms.util.ArsArmsProjectileData;
-import net.minecraft.world.InteractionHand;
+import com.mumu17.arscurios.util.ExtendedHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Final;
@@ -18,13 +18,16 @@ public class EntityHitResultMixin {
     @Inject(method = "getEntity", at = @At(value = "HEAD"), cancellable = true)
     public void getEntity(CallbackInfoReturnable<Entity> cir) {
         Entity projectile = ArsArmsProjectileData.getProjectileFromEntity(this.entity);
-        ArsArmsProjectileData projectileData = ArsArmsProjectileData.getProjectileData(projectile);
-        if (projectileData != null && projectileData.isEnabled()) {
-            Entity entity = projectileData.getTargetEntity();
-            InteractionHand hand = projectileData.getHand();
-            if (hand == null) { // If hand is null, it means the ExtendedHand is used.
-                if (entity != null) {
-                    cir.setReturnValue(entity);
+        if (projectile != null) {
+            ArsArmsProjectileData projectileData = ArsArmsProjectileData.getProjectileData(projectile);
+            if (projectileData != null && projectileData.isEnabled()) {
+                Entity entity = projectileData.getTargetEntity();
+                ExtendedHand hand = projectileData.getHand();
+                if (hand.isCurios()) {
+                    if (entity != null) {
+                        cir.setReturnValue(entity);
+                        cir.cancel();
+                    }
                 }
             }
         }

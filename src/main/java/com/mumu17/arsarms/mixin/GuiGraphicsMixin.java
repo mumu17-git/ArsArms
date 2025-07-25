@@ -1,12 +1,10 @@
 package com.mumu17.arsarms.mixin;
 
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
-import com.mumu17.arsarms.util.PlayerAmmoConsumer;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +24,6 @@ public class GuiGraphicsMixin {
     public void renderItemDecorations$afterBarVisible(Font font, ItemStack itemStack, int slotX, int slotY, String countLabel, CallbackInfo ci) {
         if (ArsArms$isAmmoBox(itemStack)) {
             Minecraft mc = minecraft;
-            Player player = mc.player;
             int value = ArsArmsAmmoBox.getChargedManaCount(itemStack);
             int max = ArsArmsAmmoBox.getMaxManaCount(itemStack);
             if (max > 0) {
@@ -41,8 +38,10 @@ public class GuiGraphicsMixin {
                 int x = slotX + 2;
                 int y = slotY + 1;
 
-                ((GuiGraphics)(Object)this).fill(x, y, x + 13, y + barHeight * 2, 0xFF000000);
-                ((GuiGraphics)(Object)this).fill(x, y, x + barWidth, y + barHeight, 0xFFAA00FF);
+                GuiGraphics graphics = ((GuiGraphics)(Object)this);
+
+                graphics.fill(x, y, x + 13, y + barHeight * 2, 0xFF000000);
+                graphics.fill(x, y, x + barWidth, y + barHeight, 0xFFAA00FF);
             }
         }
     }

@@ -15,6 +15,8 @@ public class ArsArmsNetworkHandler {
     );
 
     public static void registerMessages() {
-        CHANNEL.registerMessage(0, RequestSyncChargedManaMessage.class, RequestSyncChargedManaMessage::encode, RequestSyncChargedManaMessage::decode, RequestSyncChargedManaMessage::handle);
+        int id = 0;
+        CHANNEL.registerMessage(id++, RequestSyncChargedManaMessage.class, RequestSyncChargedManaMessage::encode, RequestSyncChargedManaMessage::decode, RequestSyncChargedManaMessage::handle);
+        CHANNEL.registerMessage(id++, RequestSyncReloadArsModeMessage.class, RequestSyncReloadArsModeMessage::encode, RequestSyncReloadArsModeMessage::decode, RequestSyncReloadArsModeMessage::handle);
     }
 }

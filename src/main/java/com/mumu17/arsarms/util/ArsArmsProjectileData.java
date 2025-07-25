@@ -2,8 +2,8 @@ package com.mumu17.arsarms.util;
 
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
-import com.tacz.guns.item.ModernKineticGunItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -11,7 +11,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -23,14 +22,14 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Objects;
 
-public class ArsArmsProjectileData {
+public class ArsArmsProjectileData{
     private final Entity targetEntity;
     private final BlockHitResult blockHitResult;
-    private final InteractionHand hand;
+    private final ExtendedHand hand;
     private final boolean isEnabled;
     private final ItemStack iGun;
 
-    public ArsArmsProjectileData(Entity target, BlockHitResult block, InteractionHand h, ItemStack gun, boolean enabled) {
+    public ArsArmsProjectileData(Entity target, BlockHitResult block, ExtendedHand h, ItemStack gun, boolean enabled) {
         targetEntity = target;
         blockHitResult = block;
         hand = h;
@@ -46,7 +45,7 @@ public class ArsArmsProjectileData {
         return blockHitResult;
     }
 
-    public InteractionHand getHand() {
+    public ExtendedHand getHand() {
         return hand;
     }
 
@@ -59,14 +58,12 @@ public class ArsArmsProjectileData {
     }
 
     private static final String
-            IS_ARS_MODE = "IsArsMode",
             ARS_ARMS_HIT_ENTITY_UUID = "ArsArmsHitEntityUUID", ARS_ARMS_HIT_ENTITY_DIMENSION = "ArsArmsHitEntityDimension",
             ARS_ARMS_PROJECTILE_ENTITY_UUID = "ArsArmsProjectileEntityUUID", ARS_ARMS_PROJECTILE_ENTITY_DIMENSION = "ArsArmsProjectileEntityDimension",
             ARS_ARMS_BLOCK_HIT_X = "ArsArmsBlockHitX", ARS_ARMS_BLOCK_HIT_Y = "ArsArmsBlockHitY", ARS_ARMS_BLOCK_HIT_Z = "ArsArmsBlockHitZ",
             ARS_ARMS_BLOCK_HIT_FACE = "ArsArmsBlockHitFace",
             ARS_ARMS_BLOCK_HIT_BLOCK_X = "ArsArmsBlockHitBlockX", ARS_ARMS_BLOCK_HIT_BLOCK_Y = "ArsArmsBlockHitBlockY", ARS_ARMS_BLOCK_HIT_BLOCK_Z = "ArsArmsBlockHitBlockZ",
-            ARS_ARMS_BLOCK_HIT_IS_INSIDE = "ArsArmsBlockHitIsInside",
-            ARS_ARMS_HAND = "ArsArmsHand";
+            ARS_ARMS_BLOCK_HIT_IS_INSIDE = "ArsArmsBlockHitIsInside";
 
 
     private static void ArsArms$SaveBlockHitResultToTag(CompoundTag tag, BlockHitResult hitResult) {
@@ -125,31 +122,6 @@ public class ArsArmsProjectileData {
         return Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID(TAG_UUID));
     }
 
-    private static void ArsArms$SaveIsArsModeToTag(CompoundTag tag, boolean isArsMode) {
-        tag.putBoolean(IS_ARS_MODE, isArsMode);
-    }
-
-    private static boolean ArsArms$LoadIsArsModeFromTag(CompoundTag tag) {
-        if (tag == null || !tag.contains(IS_ARS_MODE)) {
-            return false;
-        }
-        return tag.getBoolean(IS_ARS_MODE);
-    }
-
-    private static void ArsArms$SaveHandToTag(CompoundTag tag, ExtendedHand hand) {
-        tag.putString(ARS_ARMS_HAND, hand.name());
-    }
-
-    private static ExtendedHand ArsArms$LoadHandFromTag(CompoundTag tag) {
-        if (tag != null && tag.contains(ARS_ARMS_HAND)) {
-            String handName = tag.getString(ARS_ARMS_HAND);
-            if (!handName.isEmpty()) {
-                return ExtendedHand.valueOf(handName);
-            }
-        }
-        return ExtendedHand.MAIN_HAND;
-    }
-
 
     public static void setProjectileEntityToPlayer(LivingEntity player, Entity projectileEntity) {
         CompoundTag tag = player.getPersistentData();
@@ -159,15 +131,6 @@ public class ArsArmsProjectileData {
     public static Entity getProjectileEntityFromPlayer(LivingEntity player) {
         CompoundTag tag = player.getPersistentData();
         return ArsArms$LoadEntityFromTag(tag, player, (byte) 1);
-    }
-
-    public static InteractionHand getInteractionHandToPlayer(LivingEntity player) {
-        CompoundTag tag = player.getPersistentData();
-        ExtendedHand hand = ArsArms$LoadHandFromTag(tag);
-        if (hand.getVanillaHand().isPresent()) {
-            return hand.getVanillaHand().get();
-        }
-        return InteractionHand.MAIN_HAND;
     }
 
     public static void setProjectileToEntity(Entity entity, Entity projectileEntity) {
@@ -188,7 +151,6 @@ public class ArsArmsProjectileData {
         CompoundTag tag = projectileEntity.getPersistentData();
         ArsArms$SaveEntityToTag(tag, hitEntity, projectileEntity.level(), (byte) 0);
         ArsArms$SaveBlockHitResultToTag(tag, blockHitResult);
-        ArsArms$SaveIsArsModeToTag(tag, isArsMode);
     }
 
     
@@ -196,13 +158,14 @@ public class ArsArmsProjectileData {
         CompoundTag tag = projectileEntity.getPersistentData();
         Entity hitEntity = ArsArms$LoadEntityFromTag(tag, projectileEntity, (byte) 0);
         BlockHitResult blockHitResult = ArsArms$LoadBlockHitResultFromTag(tag);
-        boolean isArsMode = ArsArms$LoadIsArsModeFromTag(tag);
         Entity shooter = ((EntityKineticBullet) projectileEntity).getOwner();
         if (shooter instanceof Player player) {
-            ItemStack itemStack = shooter.getSlot(player.getInventory().selected).get();
-            InteractionHand hand = getInteractionHandToPlayer(player);
-            if ((hitEntity != null || blockHitResult != null) && itemStack.getItem() instanceof ModernKineticGunItem) {
-                return new ArsArmsProjectileData(hitEntity, blockHitResult, hand, itemStack, isArsMode);
+            ItemStack gunItem = shooter.getSlot(player.getInventory().selected).get();
+            ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
+            if ((hitEntity != null || blockHitResult != null) && gunItem.getItem() instanceof IGun iGun) {
+                GunItemNbt access = (GunItemNbt) iGun;
+                boolean isArsMode = access.getIsArsMode(gunItem);
+                return new ArsArmsProjectileData(hitEntity, blockHitResult, hand, gunItem, isArsMode);
             }
         }
         return null;

@@ -2,7 +2,6 @@ package com.mumu17.arsarms.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.util.GunItemNbt;
-import com.mumu17.arsarms.util.ModernKineticGunItemAccess;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import net.minecraft.world.item.ItemStack;
@@ -31,11 +30,10 @@ public class GunItemBuilderMixin {
 
     @Unique
     private void addGunTags(IGun iGun, ItemStack gun) {
-        ModernKineticGunItemAccess access0 = (ModernKineticGunItemAccess) iGun;
-        access0.setReloadAmoData(gun, false);
-        GunItemNbt access1 = (GunItemNbt) iGun;
-        access1.setLastAmmoCount(gun, ammoCount);
-        access1.setGunDamage(gun, 0.0F);
-        access1.setLastTimestamp(gun, System.currentTimeMillis());
+        GunItemNbt access = (GunItemNbt) iGun;
+        access.setIsArsMode(gun, false);
+        access.setLastAmmoCount(gun, ammoCount);
+        access.setGunDamage(gun, 0.0F);
+        access.setLastTimestamp(gun, System.currentTimeMillis());
     }
 }

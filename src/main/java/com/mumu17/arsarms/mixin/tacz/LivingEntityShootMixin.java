@@ -1,16 +1,20 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.mumu17.arsarms.util.*;
+import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
+import com.mumu17.arsarms.util.ArsArmsReloadArsModeActive;
+import com.mumu17.arsarms.util.GunItemNbt;
+import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
+import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
+import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.ShootResult;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.entity.shooter.LivingEntityShoot;
 import com.tacz.guns.entity.shooter.ShooterDataHolder;
-import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +24,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
@@ -38,41 +41,26 @@ public class LivingEntityShootMixin {
         if (this.data.currentGunItem != null) {
             ItemStack currentGunItem = this.data.currentGunItem.get();
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
-                if( shooter instanceof Player player)
-                    // PlayerAmmoConsumer.setPlayer(player);
-                    PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
-                    if (shooter instanceof Player player) {
-                        ItemStack offhand = player.getItemInHand(InteractionHand.OFF_HAND);
-                        ArsArmsReloadArsModeActive.active(currentGunItem, offhand, true);
-                    }
+                    ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(shooter);
+                    ArsArmsReloadArsModeActive.active(currentGunItem, ArsCuriosInventoryHelper.getCuriosInventoryItem(shooter, hand.getSlotName()), true);
                 }
 
-                if (this.data.currentGunItem.get().getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
-                    GunItemNbt gunItemCooldown = (GunItemNbt) this.data.currentGunItem.get().getItem();
+                if (this.data.currentGunItem.get().getItem() instanceof IGun iGun) {
+                    GunItemNbt access = (GunItemNbt) this.data.currentGunItem.get().getItem();
                     long nowTime = System.currentTimeMillis();
                     Player player = (Player) this.shooter;
-                    CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(this.data.currentGunItem.get())).orElse(null);
+                    CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(this.data.currentGunItem.get())).orElse(null);
                     if (index != null) {
                         GunData gunData = index.getGunData();
-                        int ammoCount = gunItem.useInventoryAmmo(currentGunItem) ? ArsArmsAmmoUtil.handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (modernKineticGunItem.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
-                                modernKineticGunItem.getCurrentAmmoCount(this.data.currentGunItem.get()) + (modernKineticGunItem.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                        int ammoCount = gunItem.useInventoryAmmo(currentGunItem) ? ArsArmsAmmoUtil.handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (iGun.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                iGun.getCurrentAmmoCount(this.data.currentGunItem.get()) + (iGun.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                         ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                        gunItemCooldown.setLastTimestamp(this.data.currentGunItem.get(), nowTime);
-                        gunItemCooldown.setLastAmmoCount(this.data.currentGunItem.get(), ammoCount);
+                        access.setLastTimestamp(this.data.currentGunItem.get(), nowTime);
+                        access.setLastAmmoCount(this.data.currentGunItem.get(), ammoCount);
                     }
                 }
             }
         }
     }
-
-
-    @Inject(method = "consumeAmmoFromPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCapability(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;"), remap = false)
-    public void consumeAmmoFromPlayer(CallbackInfo ci) {
-        if( shooter instanceof Player player)
-            // PlayerAmmoConsumer.setPlayer(player);
-            PlayerAmmoConsumer.setOffhand(shooter.getOffhandItem());
-    }
-
-
 }

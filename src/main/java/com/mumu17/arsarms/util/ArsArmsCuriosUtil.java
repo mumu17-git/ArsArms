@@ -1,27 +1,24 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ExtendedHand;
-import com.tacz.guns.item.ModernKineticGunItem;
+import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 public class ArsArmsCuriosUtil {
     public static ExtendedHand getCuriosSlotFromGun(Player player, ItemStack gunStack) {
-        ExtendedHand hand = ExtendedHand.OFF_HAND;
-        for (int i = 0; i < ExtendedHand.values().length; i++) {
-            LazyOptional<ICuriosItemHandler> curiosItemHandlerLazyOptional = CuriosApi.getCuriosInventory(player);
-            ICuriosItemHandler curiosItemHandler = curiosItemHandlerLazyOptional.orElse(null);
-            if (curiosItemHandler.getCurios().containsKey(ExtendedHand.values()[i].getSlotName())) {
-                ItemStack curiosStack = curiosItemHandler.getCurios().get(ExtendedHand.values()[i].getSlotName()).getStacks().getStackInSlot(0);
-                if (curiosStack.getItem() instanceof ModernKineticGunItem) {
-                    hand = ExtendedHand.values()[i];
-                    break;
+        for (ExtendedHand extendedHand : ExtendedHand.values()) {
+            ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, extendedHand.getSlotName());
+            if (curiosStack.getItem() instanceof AmmoBoxItem iAmmoBox) {
+                ArsArmsReloadArsModeActive.active(gunStack, curiosStack, false);
+                boolean isAmmoBoxOfGun = iAmmoBox.isAmmoBoxOfGun(gunStack, curiosStack);
+                ArsArmsReloadArsModeCancel.remove(gunStack, player);
+                if (isAmmoBoxOfGun) {
+                    return extendedHand;
                 }
             }
         }
-        return hand;
+        return ExtendedHand.OFF_HAND;
     }
 }

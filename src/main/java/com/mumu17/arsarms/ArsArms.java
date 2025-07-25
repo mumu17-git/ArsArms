@@ -21,6 +21,5 @@ public class ArsArms {
         ProviderRegistry.registerProjectileProvider(new ArsArmsProjectileProvider());
         ProviderRegistry.registerGunItemCooldownProvider(new ArsArmsGunCooldownProvider());
         ProviderRegistry.registerDamageAmplifierProvider(new ArsArmsAmplifierProvider());
-
     }
 }

@@ -1,9 +1,14 @@
 package com.mumu17.arsarms.mixin;
 
+import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.util.*;
+import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
+import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
+import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
-import com.tacz.guns.item.ModernKineticGunItem;
+import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.BulletData;
@@ -33,41 +38,92 @@ public class LivingEntityMixin {
     public void onTick(CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity instanceof Player player) {
+            ArsArms$ArsModeCheck(player);
             ItemStack mainhand = player.getMainHandItem();
-            // PlayerAmmoConsumer.setPlayer(player);
-            PlayerAmmoConsumer.setOffhand(player.getOffhandItem());
             if (mainhand.getItem() instanceof AbstractGunItem gunItem) {
+                GunItemNbt access = (GunItemNbt) gunItem;
+                access.setOwner(mainhand, player);
                 if (gunItem.useInventoryAmmo(mainhand)) {
-                    GunItemNbt gunItemCooldown = (GunItemNbt) gunItem;
                     long nowTime = System.currentTimeMillis();
-                    long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
+                    long timestamp = access.getLastTimestamp(mainhand);
                     if (timestamp > 0) {
                         if (nowTime - timestamp > COOL_DOWN_TIME);
                             // ArsArmsReloadArsModeCancel.removeReactiveFromGun(mainhand, player);
                     }
                 } else {
-                    GunItemNbt gunItemCooldown = (GunItemNbt) gunItem;
                     long nowTime = System.currentTimeMillis();
-                    long timestamp = gunItemCooldown.getLastTimestamp(mainhand);
-                    if (mainhand.getItem() instanceof ModernKineticGunItem modernKineticGunItem) {
-                        CommonGunIndex index = TimelessAPI.getCommonGunIndex(modernKineticGunItem.getGunId(mainhand)).orElse(null);
+                    long timestamp = access.getLastTimestamp(mainhand);
+                    if (mainhand.getItem() instanceof IGun iGun) {
+                        CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(mainhand)).orElse(null);
                         if (index != null) {
                             GunData gunData = index.getGunData();
-                            int ammoCount = gunItem.useInventoryAmmo(mainhand) ? ArsArmsAmmoUtil.handleInventoryAmmo(mainhand, player.getInventory()) + (modernKineticGunItem.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
-                                    modernKineticGunItem.getCurrentAmmoCount(mainhand) + (modernKineticGunItem.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                            int ammoCount = gunItem.useInventoryAmmo(mainhand) ? ArsArmsAmmoUtil.handleInventoryAmmo(mainhand, player.getInventory()) + (iGun.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                    iGun.getCurrentAmmoCount(mainhand) + (iGun.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
 
                             ResourceLocation ammoId = gunData.getAmmoId();
                             Optional<CommonGunIndex> gunIndexOpt = TimelessAPI.getCommonGunIndex(ammoId);
                             int coolDownTimeModifier = ArsArms$getCoolDownTimeModifier(gunIndexOpt);
 
-                            int lastAmmoCount = gunItemCooldown.getLastAmmoCount(mainhand);
+                            int lastAmmoCount = access.getLastAmmoCount(mainhand);
+
                             if (timestamp > 0) {
                                 if (nowTime - timestamp > COOL_DOWN_TIME * coolDownTimeModifier && ammoCount <= lastAmmoCount && lastAmmoCount <= 0) {
-                                    gunItemCooldown.setLastAmmoCount(mainhand, -1);
+                                    access.setLastAmmoCount(mainhand, -1);
                                     ArsArmsReloadArsModeCancel.remove(mainhand, player);
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @Unique
+    private void ArsArms$ArsModeCheck(Player player) {
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (i == player.getInventory().selected) {
+                if (stack.getItem() instanceof IGun iGun) {
+                    CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(stack)).orElse(null);
+                    if (index != null) {
+                        GunData gunData = index.getGunData();
+                        if (gunData != null) {
+                            int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                    iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                            ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
+                            if (ammoCount <= 0) {
+                                ExtendedHand hand = ArsArmsCuriosUtil.getCuriosSlotFromGun(player, stack);
+                                ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, hand.getSlotName());
+                                GunItemNbt access = (GunItemNbt) iGun;
+                                access.setOwner(stack, player);
+                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios()) {
+                                    ArsCuriosLivingEntity.setPlayerExtendedHand(player, hand);
+                                }
+                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios() && !access.getIsArsMode(stack)) {
+                                    ArsArmsReloadArsModeActive.active(stack, curiosStack, false);
+                                } else if (access.getIsArsMode(stack)) {
+                                    ArsArmsReloadArsModeCancel.remove(stack, player);
+                                }
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+            if (stack.getItem() instanceof IGun iGun) {
+                GunItemNbt access = (GunItemNbt) iGun;
+                access.setOwner(stack, player);
+                CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(stack)).orElse(null);
+                if (index != null) {
+                    GunData gunData = index.getGunData();
+                    if (gunData != null) {
+                        int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                                iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
+                        ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
+                        if ((iGun.useInventoryAmmo(stack) || (!iGun.useInventoryAmmo(stack) && ammoCount <= 0)) && access.getIsArsMode(stack)) {
+                            ArsArmsReloadArsModeCancel.remove(stack, player);
                         }
                     }
                 }

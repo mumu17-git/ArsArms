@@ -10,14 +10,13 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
 public class ArsArmsReloadArsModeActive {
-    public static void active(ItemStack currentGunItem, ItemStack offhand, boolean expendMana) {
-        // ArsArmsReloadAmmoData reloadAmmoData = access.getReloadAmoData(currentGunItem);
+    public static boolean active(ItemStack currentGunItem, ItemStack curiosAmmoBox, boolean expendMana) {
         boolean flag00 = false;
-        if (offhand.getItem() instanceof AmmoBoxItem) {
-            if (offhand.hasTag() && offhand.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
-                Tag ammoBoxTag = offhand.getOrCreateTag().get("ars_nouveau:reactive_caster");
-                if (offhand.getOrCreateTag().contains("Enchantments")) {
-                    ListTag enchantments = offhand.getOrCreateTag().getList("Enchantments", Tag.TAG_COMPOUND);
+        if (curiosAmmoBox.getItem() instanceof AmmoBoxItem) {
+            if (curiosAmmoBox.hasTag() && curiosAmmoBox.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
+                Tag ammoBoxTag = curiosAmmoBox.getOrCreateTag().get("ars_nouveau:reactive_caster");
+                if (curiosAmmoBox.getOrCreateTag().contains("Enchantments")) {
+                    ListTag enchantments = curiosAmmoBox.getOrCreateTag().getList("Enchantments", Tag.TAG_COMPOUND);
                     if (!enchantments.isEmpty()) {
                         for (int i = 0; i < enchantments.size(); i++) {
                             CompoundTag enchantmentTag = enchantments.getCompound(i);
@@ -40,6 +39,8 @@ public class ArsArmsReloadArsModeActive {
                                 enchantmentsGunItem.add(enchantmentTag);
                                 currentGunItem.getOrCreateTag().put("Enchantments", enchantmentsGunItem);
                                 flag00 = true;
+                                GunItemNbt access = (GunItemNbt) currentGunItem.getItem();
+                                access.setIsArsMode(currentGunItem, true);
                                 break;
                             }
                         }
@@ -49,9 +50,9 @@ public class ArsArmsReloadArsModeActive {
                     currentGunItem.getOrCreateTag().put("ars_nouveau:reactive_caster", ammoBoxTag);
                 }
 
-                if (expendMana) {
-                    int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(offhand);
-                    ReactiveCaster casterData = new ReactiveCaster(offhand);
+                if (expendMana && flag00) {
+                    int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(curiosAmmoBox);
+                    ReactiveCaster casterData = new ReactiveCaster(curiosAmmoBox);
                     Spell spell = casterData.getSpell();
 
                     int cost = spell.getCost();
@@ -60,11 +61,10 @@ public class ArsArmsReloadArsModeActive {
                     if (currentGunItem.getItem() instanceof ModernKineticGunItem) {
                         reloadAmmoCount = 1;
                     }
-                    offhand.getOrCreateTag().putInt("Mana", chargedManaCount - cost * reloadAmmoCount);
+                    curiosAmmoBox.getOrCreateTag().putInt("Mana", chargedManaCount - cost * reloadAmmoCount);
                 }
             }
         }
-        ModernKineticGunItemAccess access = (ModernKineticGunItemAccess) currentGunItem.getItem();
-        access.setReloadAmoData(currentGunItem, flag00);
+        return flag00;
     }
 }
