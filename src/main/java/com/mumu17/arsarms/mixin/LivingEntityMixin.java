@@ -1,6 +1,5 @@
 package com.mumu17.arsarms.mixin;
 
-import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.util.*;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
@@ -43,14 +42,7 @@ public class LivingEntityMixin {
             if (mainhand.getItem() instanceof AbstractGunItem gunItem) {
                 GunItemNbt access = (GunItemNbt) gunItem;
                 access.setOwner(mainhand, player);
-                if (gunItem.useInventoryAmmo(mainhand)) {
-                    long nowTime = System.currentTimeMillis();
-                    long timestamp = access.getLastTimestamp(mainhand);
-                    if (timestamp > 0) {
-                        if (nowTime - timestamp > COOL_DOWN_TIME);
-                            // ArsArmsReloadArsModeCancel.removeReactiveFromGun(mainhand, player);
-                    }
-                } else {
+                if (!gunItem.useInventoryAmmo(mainhand)) {
                     long nowTime = System.currentTimeMillis();
                     long timestamp = access.getLastTimestamp(mainhand);
                     if (mainhand.getItem() instanceof IGun iGun) {
@@ -93,14 +85,16 @@ public class LivingEntityMixin {
                             int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                            if (ammoCount <= 0) {
+                            GunItemNbt access = (GunItemNbt) iGun;
+                            if (ammoCount <= 0 || access.getLastAmmoCount(stack) <= -1 || iGun.useInventoryAmmo(stack)) {
+                                ExtendedHand originalHand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
                                 ExtendedHand hand = ArsArmsCuriosUtil.getCuriosSlotFromGun(player, stack);
                                 ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, hand.getSlotName());
-                                GunItemNbt access = (GunItemNbt) iGun;
                                 access.setOwner(stack, player);
-                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios()) {
-                                    ArsCuriosLivingEntity.setPlayerExtendedHand(player, hand);
+                                if (!(curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios())) {
+                                    ArsCuriosLivingEntity.setPlayerExtendedHand(player, originalHand);
                                 }
+                                hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
                                 if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios() && !access.getIsArsMode(stack)) {
                                     ArsArmsReloadArsModeActive.active(stack, curiosStack, false);
                                 } else if (access.getIsArsMode(stack)) {

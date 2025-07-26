@@ -17,13 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin {
 
-    @Shadow @Final
-    private Minecraft minecraft;
-
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getBarWidth()I"))
     public void renderItemDecorations$afterBarVisible(Font font, ItemStack itemStack, int slotX, int slotY, String countLabel, CallbackInfo ci) {
         if (ArsArms$isAmmoBox(itemStack)) {
-            Minecraft mc = minecraft;
             int value = ArsArmsAmmoBox.getChargedManaCount(itemStack);
             int max = ArsArmsAmmoBox.getMaxManaCount(itemStack);
             if (max > 0) {

@@ -72,7 +72,7 @@ public class ArsArmsReloadArsModeCancel {
                                 iGun.getCurrentAmmoCount(gunItem) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                         ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                         GunItemNbt access = (GunItemNbt) iGun;
-                        boolean isArsMode = ((GunItemNbt) iGun).getIsArsMode(gunItem);
+                        boolean isArsMode = access.getIsArsMode(gunItem);
                         if (isArsMode) {
                             if (gunItem.hasTag() && gunItem.getOrCreateTag().contains("ars_nouveau:reactive_caster")) {
                                 if (gunItem.getOrCreateTag().contains("Enchantments")) {
