@@ -18,8 +18,8 @@ public class ArsArms {
 
     public ArsArms() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ArsArmsConfig.COMMON_SPEC);
-        ProviderRegistry.registerProjectileProvider(new ArsArmsProjectileProvider());
-        ProviderRegistry.registerGunItemCooldownProvider(new ArsArmsGunCooldownProvider());
-        ProviderRegistry.registerDamageAmplifierProvider(new ArsArmsAmplifierProvider());
+        ProviderRegistry.registerProjectileProvider(MODID, new ArsArmsProjectileProvider());
+        ProviderRegistry.registerArmsNbtProvider(MODID, new ArsArmsGunCooldownProvider());
+        ProviderRegistry.registerDamageAmplifierProvider(MODID, new ArsArmsAmplifierProvider());
     }
 }

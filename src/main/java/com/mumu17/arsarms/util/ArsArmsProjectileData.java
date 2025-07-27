@@ -1,7 +1,10 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.castlib.CastLib;
+import com.mumu17.castlib.util.ProviderRegistry;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.core.BlockPos;
@@ -120,6 +123,11 @@ public class ArsArmsProjectileData{
             return null;
 
         return Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID(TAG_UUID));
+    }
+
+    public static void ArsArms$SaveCastModIDToTag(CompoundTag tag, String modId) {
+        if (modId == null || modId.isEmpty()) return;
+        tag.putString(ProviderRegistry.CAST_MOD_TAG, modId);
     }
 
 

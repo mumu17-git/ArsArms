@@ -4,6 +4,7 @@ import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
 import com.mumu17.arsarms.util.ArsArmsProjectileData;
 import com.mumu17.arsarms.util.GunItemNbt;
@@ -29,8 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(EntityKineticBullet.class)
 public class EntityKineticBulletMixin {
 
@@ -42,6 +41,7 @@ public class EntityKineticBulletMixin {
         if (ArsArms$canCastSpell(s)) {
             ReactiveCaster reactiveCaster = new ReactiveCaster(s);
             InteractionHand interactionHand = ArsCuriosLivingEntity.getPlayerExtendedHand(playerIn).getVanillaHand();
+            ArsArmsProjectileData.ArsArms$SaveCastModIDToTag(playerIn.getPersistentData(), ArsArms.MODID);
             reactiveCaster.castSpell(playerIn.getCommandSenderWorld(), playerIn, interactionHand, (Component) null);
         }
     }

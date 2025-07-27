@@ -8,8 +8,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
-import java.util.Optional;
-
 public class ArsArmsProjectileProvider implements IProjectileDataProvider {
     @Override
     public boolean isEnabled(LivingEntity entity) {
@@ -32,7 +30,7 @@ public class ArsArmsProjectileProvider implements IProjectileDataProvider {
     }
 
     @Override
-    public ItemStack getCurrentGun(LivingEntity entity) {
+    public ItemStack getArms(LivingEntity entity) {
         return getProjectile(entity).getCurrentGun();
     }
 

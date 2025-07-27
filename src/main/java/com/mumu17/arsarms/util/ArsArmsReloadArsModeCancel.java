@@ -62,15 +62,11 @@ public class ArsArmsReloadArsModeCancel {
 
     public static void remove(ItemStack gunItem, LivingEntity shooter) {
         if (gunItem != ItemStack.EMPTY && gunItem.getItem() instanceof IGun iGun) {
-            boolean useInventoryAmmo = iGun.useInventoryAmmo(gunItem);
-            if(shooter instanceof Player player) {
+            if(shooter instanceof Player) {
                 CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(gunItem)).orElse(null);
                 if (index != null) {
                     GunData gunData = index.getGunData();
                     if (gunData != null) {
-                        int ammoCount = useInventoryAmmo ? ArsArmsAmmoUtil.handleInventoryAmmo(gunItem, player.getInventory()) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
-                                iGun.getCurrentAmmoCount(gunItem) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
-                        ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                         GunItemNbt access = (GunItemNbt) iGun;
                         boolean isArsMode = access.getIsArsMode(gunItem);
                         if (isArsMode) {
