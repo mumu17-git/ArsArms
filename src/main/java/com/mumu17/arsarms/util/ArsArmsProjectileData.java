@@ -126,57 +126,67 @@ public class ArsArmsProjectileData{
     }
 
     public static void ArsArms$SaveCastModIDToTag(CompoundTag tag, String modId) {
-        if (modId == null || modId.isEmpty()) return;
+        if (modId == null || tag == null) return;
         tag.putString(ProviderRegistry.CAST_MOD_TAG, modId);
     }
 
 
     public static void setProjectileEntityToPlayer(LivingEntity player, Entity projectileEntity) {
-        CompoundTag tag = player.getPersistentData();
+        if (projectileEntity == null || player == null) return;
+        CompoundTag tag = !player.getPersistentData().isEmpty() ? player.getPersistentData() : null;
+        if (tag == null) return;
         ArsArms$SaveEntityToTag(tag, projectileEntity, player.level(), (byte) 1);
     }
 
     public static Entity getProjectileEntityFromPlayer(LivingEntity player) {
-        CompoundTag tag = player.getPersistentData();
+        CompoundTag tag = !player.getPersistentData().isEmpty() ? player.getPersistentData() : null;
+        if (tag == null) return null;
         return ArsArms$LoadEntityFromTag(tag, player, (byte) 1);
     }
 
     public static void setProjectileToEntity(Entity entity, Entity projectileEntity) {
-        CompoundTag tag = entity.getPersistentData();
+        if (projectileEntity == null || entity == null) return;
+        CompoundTag tag = !entity.getPersistentData().isEmpty() ? entity.getPersistentData() : null;
+        if (tag == null) return;
         ArsArms$SaveEntityToTag(tag, projectileEntity, entity.level(), (byte) 1);
     }
 
     public static Entity getProjectileFromEntity(Entity entity) {
-        CompoundTag tag = entity.getPersistentData();
+        if (entity == null) return null;
+        CompoundTag tag = !entity.getPersistentData().isEmpty() ? entity.getPersistentData() : null;
+        if (tag == null) return null;
         return ArsArms$LoadEntityFromTag(tag, entity, (byte) 1);
     }
     
-    public static void setProjectileData(Entity projectileEntity, Entity hitEntity, BlockHitResult blockHitResult, ExtendedHand extendedHand, boolean isArsMode) {
+    public static void setProjectileData(Entity projectileEntity, Entity hitEntity, BlockHitResult blockHitResult, ExtendedHand extendedHand) {
         if (projectileEntity instanceof Projectile projectile){
+            CompoundTag tag = projectileEntity.getPersistentData();
+            setProjectileToEntity(hitEntity, projectileEntity);
             setProjectileEntityToPlayer((LivingEntity) projectile.getOwner(), projectileEntity);
             ArsCuriosLivingEntity.setPlayerExtendedHand((LivingEntity) projectile.getOwner(), extendedHand);
+            ArsArms$SaveEntityToTag(tag, hitEntity, projectileEntity.level(), (byte) 0);
+            ArsArms$SaveBlockHitResultToTag(tag, blockHitResult);
         }
-        CompoundTag tag = projectileEntity.getPersistentData();
-        ArsArms$SaveEntityToTag(tag, hitEntity, projectileEntity.level(), (byte) 0);
-        ArsArms$SaveBlockHitResultToTag(tag, blockHitResult);
     }
 
     
     public static ArsArmsProjectileData getProjectileData(Entity projectileEntity) {
-        CompoundTag tag = projectileEntity.getPersistentData();
-        Entity hitEntity = ArsArms$LoadEntityFromTag(tag, projectileEntity, (byte) 0);
-        BlockHitResult blockHitResult = ArsArms$LoadBlockHitResultFromTag(tag);
-        Entity shooter = ((EntityKineticBullet) projectileEntity).getOwner();
-        if (shooter instanceof Player player) {
-            ItemStack gunItem = shooter.getSlot(player.getInventory().selected).get();
-            ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
-            if ((hitEntity != null || blockHitResult != null) && gunItem.getItem() instanceof IGun iGun) {
-                GunItemNbt access = (GunItemNbt) iGun;
-                boolean isArsMode = access.getIsArsMode(gunItem);
-                return new ArsArmsProjectileData(hitEntity, blockHitResult, hand, gunItem, isArsMode);
+        if (projectileEntity instanceof Projectile) {
+            CompoundTag tag = projectileEntity.getPersistentData();
+            Entity hitEntity = ArsArms$LoadEntityFromTag(tag, projectileEntity, (byte) 0);
+            BlockHitResult blockHitResult = ArsArms$LoadBlockHitResultFromTag(tag);
+            Entity shooter = ((EntityKineticBullet) projectileEntity).getOwner();
+            if (shooter instanceof Player player) {
+                ItemStack gunItem = shooter.getSlot(player.getInventory().selected).get();
+                ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
+                if ((hitEntity != null || blockHitResult != null) && gunItem.getItem() instanceof IGun iGun) {
+                    GunItemNbt access = (GunItemNbt) iGun;
+                    boolean isArsMode = access.getIsArsMode(gunItem);
+                    return new ArsArmsProjectileData(hitEntity, blockHitResult, hand, gunItem, isArsMode);
+                }
             }
         }
-        return null;
+        return new ArsArmsProjectileData(null, null, ExtendedHand.MAIN_HAND, ItemStack.EMPTY, false);
     }
 }
 

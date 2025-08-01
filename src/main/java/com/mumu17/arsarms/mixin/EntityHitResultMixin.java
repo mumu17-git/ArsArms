@@ -17,19 +17,19 @@ public class EntityHitResultMixin {
 
     @Inject(method = "getEntity", at = @At(value = "HEAD"), cancellable = true)
     public void getEntity(CallbackInfoReturnable<Entity> cir) {
-        Entity projectile = ArsArmsProjectileData.getProjectileFromEntity(this.entity);
-        if (projectile != null) {
-            ArsArmsProjectileData projectileData = ArsArmsProjectileData.getProjectileData(projectile);
-            if (projectileData != null && projectileData.isEnabled()) {
-                Entity entity = projectileData.getTargetEntity();
-                ExtendedHand hand = projectileData.getHand();
-                if (hand.isCurios()) {
-                    if (entity != null) {
-                        cir.setReturnValue(entity);
-                        cir.cancel();
-                    }
-                }
-            }
-        }
+//        Entity projectile = ArsArmsProjectileData.getProjectileFromEntity(this.entity);
+//        if (projectile != null) {
+//            ArsArmsProjectileData projectileData = ArsArmsProjectileData.getProjectileData(projectile);
+//            if (projectileData.isEnabled()) {
+//                Entity entity = projectileData.getTargetEntity();
+//                ExtendedHand hand = projectileData.getHand();
+//                if (hand.isCurios()) {
+//                    if (entity != null) {
+//                        cir.setReturnValue(entity);
+//                        cir.cancel();
+//                    }
+//                }
+//            }
+//        }
     }
 }

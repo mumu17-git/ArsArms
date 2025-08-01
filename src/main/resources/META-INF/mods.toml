@@ -70,6 +70,15 @@ description='''${mod_description}'''
    ordering="NONE"
    side="BOTH"
 
+
+[[dependencies."${mod_id}"]]
+   # This is a dependency on the mod itself, which is useful for mods that have multiple modules
+   modId="arscurios"
+   mandatory=true
+   versionRange="[${arscurios_version},)"
+   ordering="NONE"
+   side="BOTH"
+
 [[dependencies."${mod_id}"]]
    # This is a dependency on the mod itself, which is useful for mods that have multiple modules
    modId="tacz"

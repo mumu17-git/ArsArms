@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 @Mixin(ModernKineticGunItem.class)
-public class ModernKineticGunItemMixin implements GunItemNbt{
+public class ModernKineticGunItemMixin implements GunItemNbt {
 
     @Unique
     private static final int MAX_AMMO_COUNT = 9999;
@@ -94,7 +94,7 @@ public class ModernKineticGunItemMixin implements GunItemNbt{
         if (server.getLevel(dimension) == null)
             return null;
 
-        return (LivingEntity) Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID("OwnerUUID"));
+        return (LivingEntity) Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID(OWNER_UUID));
     }
 
     @Unique

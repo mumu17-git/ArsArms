@@ -1,5 +1,7 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.arsarms.ArsArms;
+import com.mumu17.arscurios.util.ExtendedHand;
 import com.mumu17.castlib.util.IProjectileDataProvider;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.world.InteractionHand;
@@ -34,11 +36,12 @@ public class ArsArmsProjectileProvider implements IProjectileDataProvider {
         return getProjectile(entity).getCurrentGun();
     }
 
-    public ArsArmsProjectileData getProjectile(LivingEntity entity) {
+    public ArsArmsProjectileData getProjectile(LivingEntity entityFrom) {
+        LivingEntity entity = (LivingEntity) LivingEntityUtil.getLivingEntityFromUUID(entityFrom);
         Entity projectileEntity = ArsArmsProjectileData.getProjectileEntityFromPlayer(entity);
         if (projectileEntity instanceof EntityKineticBullet) {
             return ArsArmsProjectileData.getProjectileData(projectileEntity);
         }
-        return null;
+        return new ArsArmsProjectileData(null, null, ExtendedHand.MAIN_HAND, ItemStack.EMPTY, false);
     }
 }
