@@ -1,6 +1,7 @@
 package com.mumu17.arsarms.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mumu17.arsarms.util.ArsArmsGunUtil;
 import com.mumu17.arsarms.util.GunItemNbt;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
@@ -20,20 +21,11 @@ public class GunItemBuilderMixin {
 
     @Inject(method = "forceBuild", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IGun;setBulletInBarrel(Lnet/minecraft/world/item/ItemStack;Z)V", shift = At.Shift.AFTER), remap = false)
     private void forceBuild(CallbackInfoReturnable<?> cir, @Local(name = "iGun") IGun iGun, @Local(name = "gun") ItemStack gun) {
-        addGunTags(iGun, gun);
+        ArsArmsGunUtil.addGunTags(iGun, gun, this.ammoCount);
     }
 
     @Inject(method = "build", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/IGun;setBulletInBarrel(Lnet/minecraft/world/item/ItemStack;Z)V", shift = At.Shift.AFTER), remap = false)
     private void build(CallbackInfoReturnable<ItemStack> cir, @Local(name = "iGun") IGun iGun, @Local(name = "gun") ItemStack gun) {
-        addGunTags(iGun, gun);
-    }
-
-    @Unique
-    private void addGunTags(IGun iGun, ItemStack gun) {
-        GunItemNbt access = (GunItemNbt) iGun;
-        access.setIsArsMode(gun, false);
-        access.setLastAmmoCount(gun, ammoCount);
-        access.setGunDamage(gun, 0.0F);
-        access.setLastTimestamp(gun, System.currentTimeMillis());
+        ArsArmsGunUtil.addGunTags(iGun, gun, this.ammoCount);
     }
 }

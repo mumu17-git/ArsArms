@@ -139,6 +139,7 @@ public class ArsArmsProjectileData{
     }
 
     public static Entity getProjectileEntityFromPlayer(LivingEntity player) {
+        if (player == null) return null;
         CompoundTag tag = !player.getPersistentData().isEmpty() ? player.getPersistentData() : null;
         if (tag == null) return null;
         return ArsArms$LoadEntityFromTag(tag, player, (byte) 1);

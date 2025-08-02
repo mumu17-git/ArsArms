@@ -41,7 +41,6 @@ public class LivingEntityMixin {
             ItemStack mainhand = player.getMainHandItem();
             if (mainhand.getItem() instanceof AbstractGunItem gunItem) {
                 GunItemNbt access = (GunItemNbt) gunItem;
-                access.setOwner(mainhand, player);
                 if (!gunItem.useInventoryAmmo(mainhand)) {
                     long nowTime = System.currentTimeMillis();
                     long timestamp = access.getLastTimestamp(mainhand);
@@ -78,6 +77,7 @@ public class LivingEntityMixin {
             ItemStack stack = player.getInventory().getItem(i);
             if (i == player.getInventory().selected) {
                 if (stack.getItem() instanceof IGun iGun) {
+                    GunItemNbt access = (GunItemNbt) iGun;
                     CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(stack)).orElse(null);
                     if (index != null) {
                         GunData gunData = index.getGunData();
@@ -85,7 +85,6 @@ public class LivingEntityMixin {
                             int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                            GunItemNbt access = (GunItemNbt) iGun;
                             if (ammoCount <= 0 || access.getLastAmmoCount(stack) <= -1 || iGun.useInventoryAmmo(stack)) {
                                 ExtendedHand originalHand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
                                 ExtendedHand hand = ArsArmsCuriosUtil.getCuriosSlotFromGun(player, stack);

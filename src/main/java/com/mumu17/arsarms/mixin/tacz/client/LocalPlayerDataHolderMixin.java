@@ -45,7 +45,6 @@ public class LocalPlayerDataHolderMixin {
                     GunItemNbt access = (GunItemNbt) iGun;
                     boolean reloadAmmoData = access.getIsArsMode(currentGunItem);
                     ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
-                    ItemStack curiosAmmoBox = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, hand.getSlotName());
                     boolean useInventoryAmmo = iGun.useInventoryAmmo(currentGunItem);
                     CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(currentGunItem)).orElse(null);
                     if (index != null) {
