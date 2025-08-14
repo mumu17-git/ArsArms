@@ -10,6 +10,7 @@ import com.mumu17.arsarms.util.ArsArmsProjectileData;
 import com.mumu17.arsarms.util.GunItemNbt;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.castlib.util.CastLibTags;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.util.TacHitResult;
@@ -42,7 +43,7 @@ public class EntityKineticBulletMixin {
             ReactiveCaster reactiveCaster = new ReactiveCaster(s);
             InteractionHand interactionHand = ArsCuriosLivingEntity.getPlayerExtendedHand(attacker).getVanillaHand();
             CompoundTag tag = attacker.getPersistentData();
-            ArsArmsProjectileData.ArsArms$SaveCastModIDToTag(tag, ArsArms.MODID);
+            CastLibTags.saveCastModIDToTag(tag, ArsArms.MODID);
             reactiveCaster.castSpell(attacker.getCommandSenderWorld(), attacker, interactionHand, (Component) null);
         }
     }
@@ -95,7 +96,7 @@ public class EntityKineticBulletMixin {
                 if (gunItem.getItem() instanceof IGun iGun && arsArmsProjectileData != null) {
                     Entity entity = arsArmsProjectileData.getTargetEntity();
                     ExtendedHand hand = arsArmsProjectileData.getHand();
-                    if (hand.isCurios()) {
+                    if (hand.isAmmoBox()) {
                         if (entity != null) {
                             GunItemNbt access = (GunItemNbt) iGun;
                             boolean isArsMode = access.getIsArsMode(gunItem);
@@ -116,7 +117,7 @@ public class EntityKineticBulletMixin {
         if(arsArmsProjectileData != null && arsArmsProjectileData.isEnabled()) {
             Entity entity = arsArmsProjectileData.getTargetEntity();
             ExtendedHand hand = arsArmsProjectileData.getHand();
-            if (hand.isCurios()) {
+            if (hand.isAmmoBox()) {
                 if (entity != null) {
                     if (projectileEntity.getOwner() instanceof Player player) {
                         GunItemNbt gunItemCooldown = (GunItemNbt) player.getMainHandItem().getItem();

@@ -34,7 +34,7 @@ public class AbstractGunItemMixin {
                 GunItemNbt access = (GunItemNbt) iGun;
                 LivingEntity owner = access.getOwner(gunItem);
                 if (owner != null) {
-                    ItemStack checkAmmoStack = (extendedHand.isCurios() ? ArsCuriosInventoryHelper.getCuriosInventoryItem(owner, extendedHand.getSlotName()) : owner.getItemInHand(InteractionHand.valueOf(extendedHand.getSlotName())));
+                    ItemStack checkAmmoStack = (extendedHand.isAmmoBox() ? ArsCuriosInventoryHelper.getCuriosInventoryItem(owner, extendedHand.getSlotName()) : (!extendedHand.isCurios() ? owner.getItemInHand(InteractionHand.valueOf(extendedHand.getSlotName())) : ItemStack.EMPTY));
                     Item extractItem = checkAmmoStack.getItem();
                     if (extractItem instanceof AmmoBoxItem iAmmoBox) {
                         if (iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {

@@ -90,11 +90,11 @@ public class LivingEntityMixin {
                                 ExtendedHand hand = ArsArmsCuriosUtil.getCuriosSlotFromGun(player, stack);
                                 ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, hand.getSlotName());
                                 access.setOwner(stack, player);
-                                if (!(curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios())) {
+                                if (!(curiosStack.getItem() instanceof AmmoBoxItem && hand.isAmmoBox())) {
                                     ArsCuriosLivingEntity.setPlayerExtendedHand(player, originalHand);
                                 }
                                 hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
-                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isCurios() && !access.getIsArsMode(stack)) {
+                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isAmmoBox() && !access.getIsArsMode(stack)) {
                                     ArsArmsReloadArsModeActive.active(stack, curiosStack, false);
                                 } else if (access.getIsArsMode(stack)) {
                                     ArsArmsReloadArsModeCancel.remove(stack, player);

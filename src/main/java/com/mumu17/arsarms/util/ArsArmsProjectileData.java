@@ -125,11 +125,6 @@ public class ArsArmsProjectileData{
         return Objects.requireNonNull(server.getLevel(dimension)).getEntity(tag.getUUID(TAG_UUID));
     }
 
-    public static void ArsArms$SaveCastModIDToTag(CompoundTag tag, String modId) {
-        if (modId == null || tag == null) return;
-        tag.putString(ProviderRegistry.CAST_MOD_TAG, modId);
-    }
-
 
     public static void setProjectileEntityToPlayer(LivingEntity player, Entity projectileEntity) {
         if (projectileEntity == null || player == null) return;
