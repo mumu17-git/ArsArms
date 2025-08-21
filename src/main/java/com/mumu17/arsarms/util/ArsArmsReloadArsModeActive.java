@@ -2,6 +2,7 @@ package com.mumu17.arsarms.util;
 
 import com.hollingsworth.arsnouveau.api.spell.Spell;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
+import com.mumu17.armslib.util.GunItemNbt;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.ModernKineticGunItem;
 import net.minecraft.nbt.CompoundTag;

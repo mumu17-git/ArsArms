@@ -1,9 +1,8 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.mumu17.arsarms.ArsArms;
+import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
 import com.mumu17.arsarms.util.ArsArmsReloadArsModeActive;
-import com.mumu17.arsarms.util.GunItemNbt;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;

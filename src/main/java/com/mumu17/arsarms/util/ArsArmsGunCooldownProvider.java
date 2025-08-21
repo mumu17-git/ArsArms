@@ -1,5 +1,6 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.castlib.util.IArmsNbtProvider;
 import net.minecraft.world.item.ItemStack;
 

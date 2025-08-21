@@ -2,13 +2,11 @@ package com.mumu17.arsarms.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.arsarms.util.ArsArmsGunUtil;
-import com.mumu17.arsarms.util.GunItemNbt;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;

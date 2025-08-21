@@ -6,23 +6,16 @@
   "refmap": "arsarms.refmap.json",
   "mixins": [
     "LivingEntityMixin",
-    "tacz.AbstractGunItemMixin",
-    "tacz.AmmoBoxItemMixin",
-    "tacz.AmmoItemMixin",
     "tacz.EntityKineticBulletMixin",
     "tacz.EntityUtilMixin",
     "tacz.GunItemBuilderMixin",
-    "tacz.LivingEntityReloadMixin",
     "tacz.LivingEntityShootMixin",
-    "tacz.ModernKineticGunItemMixin",
-    "tacz.ModernKineticGunScriptAPIMixin",
-    "tacz.ProjectileExplosionMixin",
-    "tacz.client.GunAnimationStateContextMixin",
-    "tacz.client.GunHudOverlayMixin",
-    "tacz.client.LocalPlayerDataHolderMixin"
+    "tacz.ModernKineticGunItemMixin"
   ],
   "client": [
-    "GuiGraphicsMixin"
+    "GuiGraphicsMixin",
+    "tacz.client.GunHudOverlayMixin",
+    "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

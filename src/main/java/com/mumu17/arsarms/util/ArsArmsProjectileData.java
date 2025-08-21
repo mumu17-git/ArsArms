@@ -1,10 +1,8 @@
 package com.mumu17.arsarms.util;
 
-import com.mumu17.arsarms.ArsArms;
+import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
-import com.mumu17.castlib.CastLib;
-import com.mumu17.castlib.util.ProviderRegistry;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.core.BlockPos;

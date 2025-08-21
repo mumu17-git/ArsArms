@@ -1,10 +1,10 @@
 package com.mumu17.arsarms.util;
 
+import com.mumu17.armslib.util.GunItemNbt;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

@@ -1,10 +1,9 @@
 package com.mumu17.arsarms.mixin.tacz.client;
 
+import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.network.ArsArmsNetworkHandler;
 import com.mumu17.arsarms.network.RequestSyncReloadArsModeMessage;
 import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
-import com.mumu17.arsarms.util.GunItemNbt;
-import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.TimelessAPI;

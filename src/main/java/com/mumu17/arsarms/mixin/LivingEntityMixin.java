@@ -1,5 +1,6 @@
 package com.mumu17.arsarms.mixin;
 
+import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.util.*;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;

@@ -164,10 +164,11 @@ dependencies {
     implementation fg.deobf("curse.maven:timeless-and-classics-zero-1028108:${tacz_version_cf_id}")
     implementation fg.deobf("curse.maven:ars-nouveau-401955:${ars_nouveau_version_cf_id}")
     implementation fg.deobf("curse.maven:curios-309927:${curios_version_cf_id}")
-    compileOnly fg.deobf("curse.maven:geckolib-388172:${geckolib_version_cf_id}")
+    implementation fg.deobf("curse.maven:geckolib-388172:${geckolib_version_cf_id}")
 
     implementation fg.deobf("curse.maven:castlib-1310383:${cast_lib_version_cf_id}")
     implementation fg.deobf("curse.maven:arscurios-1311075:${ars_curios_version_cf_id}")
+    implementation fg.deobf("curse.maven:armslib-1328268:${arms_lib_version_cf_id}")
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version_cf_id}")
     runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6608233")
@@ -205,7 +206,7 @@ tasks.named('processResources', ProcessResources).configure {
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
-            tacz_version: tacz_version, ars_nouveau_version: ars_nouveau_version, castlib_version: cast_lib_version, arscurios_version: ars_curios_version,
+            tacz_version: tacz_version, ars_nouveau_version: ars_nouveau_version, castlib_version: cast_lib_version, arscurios_version: ars_curios_version,arms_lib_version: arms_lib_version,
     ]
 
     inputs.properties replaceProperties

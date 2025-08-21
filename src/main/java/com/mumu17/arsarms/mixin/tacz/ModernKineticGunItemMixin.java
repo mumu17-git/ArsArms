@@ -1,6 +1,6 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.mumu17.arsarms.util.GunItemNbt;
+import com.mumu17.armslib.util.GunItemNbt;
 import com.tacz.guns.item.ModernKineticGunItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
