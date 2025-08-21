@@ -1,35 +1,20 @@
 package com.mumu17.arsarms.mixin.tacz;
 
-import com.mumu17.arsarms.ArsArms;
-import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
 import com.mumu17.arsarms.util.GunItemNbt;
-import com.tacz.guns.api.TimelessAPI;
-import com.tacz.guns.api.entity.ReloadState;
-import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.entity.shooter.ShooterDataHolder;
 import com.tacz.guns.item.ModernKineticGunItem;
-import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.Bolt;
-import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 @Mixin(ModernKineticGunItem.class)
 public class ModernKineticGunItemMixin implements GunItemNbt {
@@ -133,9 +118,9 @@ public class ModernKineticGunItemMixin implements GunItemNbt {
 
     @Unique
     @Override
-    public void setGunDamage(ItemStack gunItem, float ammoCount) {
+    public void setGunDamage(ItemStack gunItem, float damage) {
         CompoundTag tag = gunItem.getOrCreateTag();
-        tag.putFloat(LAST_GUN_DAMAGE, ammoCount);
+        tag.putFloat(LAST_GUN_DAMAGE, damage);
     }
 
     @Unique
@@ -146,32 +131,5 @@ public class ModernKineticGunItemMixin implements GunItemNbt {
             return tag.getFloat(LAST_GUN_DAMAGE);
         }
         return 0.0F;
-    }
-
-    // May not be needed.
-    @Inject(method = "shoot", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Optional;ofNullable(Ljava/lang/Object;)Ljava/util/Optional;"), remap = false)
-    public void shoot(ShooterDataHolder dataHolder, ItemStack gunItem, Supplier<Float> pitch, Supplier<Float> yaw, LivingEntity shooter, CallbackInfo ci) {
-        if (gunItem.getItem() instanceof IGun iGun) {
-            boolean useInventoryAmmo = iGun.useInventoryAmmo(gunItem);
-            if(shooter instanceof Player player) {
-                CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(gunItem)).orElse(null);
-                if (index != null) {
-                    GunData gunData = index.getGunData();
-                    if (gunData != null) {
-                        int ammoCount = useInventoryAmmo ? ArsArmsAmmoUtil.handleInventoryAmmo(gunItem, player.getInventory()) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
-                                iGun.getCurrentAmmoCount(gunItem) + (iGun.hasBulletInBarrel(gunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
-                        ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                    }
-                }
-            }
-        }
-    }
-
-    @ModifyArg(method = "lambda$tickReload$12", at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/entity/ReloadState;setStateType(Lcom/tacz/guns/api/entity/ReloadState$StateType;)V"), remap = false)
-    private static ReloadState.StateType tickReload(ReloadState.StateType stateType) {
-        if (!stateType.isReloading()) {
-
-        }
-        return stateType;
     }
 }
