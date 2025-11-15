@@ -1,7 +1,7 @@
 package com.mumu17.arsarms.mixin.tacz;
 
+import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
-import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
 import com.mumu17.arsarms.util.ArsArmsReloadArsModeActive;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
@@ -43,7 +43,7 @@ public class LivingEntityShootMixin {
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
                     ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(shooter);
-                    ArsArmsReloadArsModeActive.active(currentGunItem, ArsCuriosInventoryHelper.getCuriosInventoryItem(shooter, hand.getSlotName()), true);
+                    ArsArmsReloadArsModeActive.active(currentGunItem, ArsCuriosInventoryHelper.getCuriosInventoryItem(shooter, hand.getSlotName()), shooter, true);
                 }
 
                 if (this.data.currentGunItem.get().getItem() instanceof IGun iGun) {
@@ -53,7 +53,7 @@ public class LivingEntityShootMixin {
                         CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(this.data.currentGunItem.get())).orElse(null);
                         if (index != null) {
                             GunData gunData = index.getGunData();
-                            int ammoCount = gunItem.useInventoryAmmo(currentGunItem) ? ArsArmsAmmoUtil.handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (iGun.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                            int ammoCount = gunItem.useInventoryAmmo(currentGunItem) ? ArmsLibAmmoUtil.handleInventoryAmmo(this.data.currentGunItem.get(), player.getInventory()) + (iGun.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(this.data.currentGunItem.get()) + (iGun.hasBulletInBarrel(this.data.currentGunItem.get()) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                             access.setLastTimestamp(this.data.currentGunItem.get(), nowTime);

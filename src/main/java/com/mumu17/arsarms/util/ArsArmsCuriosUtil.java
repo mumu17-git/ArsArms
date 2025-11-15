@@ -12,7 +12,7 @@ public class ArsArmsCuriosUtil {
         for (ExtendedHand extendedHand : ExtendedHand.values()) {
             ItemStack curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, extendedHand.getSlotName());
             if (curiosStack.getItem() instanceof AmmoBoxItem iAmmoBox) {
-                if(ArsArmsReloadArsModeActive.active(gunStack, curiosStack, false)) {
+                if(ArsArmsReloadArsModeActive.active(gunStack, curiosStack, player, false)) {
                     ArsCuriosLivingEntity.setPlayerExtendedHand(player, extendedHand);
                     boolean isAmmoBoxOfGun = iAmmoBox.isAmmoBoxOfGun(gunStack, curiosStack);
                     ArsArmsReloadArsModeCancel.remove(gunStack, player);

@@ -39,9 +39,9 @@ public class RequestSyncReloadArsModeMessage {
                 var curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, msg.curiosSlot);
                 if (!curiosStack.isEmpty() && !gunStack.isEmpty() && curiosStack.getItem() instanceof AmmoBoxItem && gunStack.getItem() instanceof IGun) {
                     if (msg.flag == 0) {
-                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, true);
+                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, player, true);
                     } else if (msg.flag == 1) {
-                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, false);
+                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, player, false);
                     } else if (msg.flag == 2) {
                         ArsArmsReloadArsModeCancel.remove(gunStack, player);
                     } else if (msg.flag == 3) {

@@ -1,5 +1,6 @@
 package com.mumu17.arsarms.mixin;
 
+import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.util.*;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
@@ -49,7 +50,7 @@ public class LivingEntityMixin {
                         CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(mainhand)).orElse(null);
                         if (index != null) {
                             GunData gunData = index.getGunData();
-                            int ammoCount = gunItem.useInventoryAmmo(mainhand) ? ArsArmsAmmoUtil.handleInventoryAmmo(mainhand, player.getInventory()) + (iGun.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                            int ammoCount = gunItem.useInventoryAmmo(mainhand) ? ArmsLibAmmoUtil.handleInventoryAmmo(mainhand, player.getInventory()) + (iGun.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(mainhand) + (iGun.hasBulletInBarrel(mainhand) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
 
@@ -83,7 +84,7 @@ public class LivingEntityMixin {
                     if (index != null) {
                         GunData gunData = index.getGunData();
                         if (gunData != null) {
-                            int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                            int ammoCount = iGun.useInventoryAmmo(stack) ? ArmsLibAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                             if (ammoCount <= 0 || access.getLastAmmoCount(stack) <= -1 || iGun.useInventoryAmmo(stack)) {
@@ -95,9 +96,9 @@ public class LivingEntityMixin {
                                     ArsCuriosLivingEntity.setPlayerExtendedHand(player, originalHand);
                                 }
                                 hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
-                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isAmmoBox() && !access.getIsArsMode(stack)) {
-                                    ArsArmsReloadArsModeActive.active(stack, curiosStack, false);
-                                } else if (access.getIsArsMode(stack)) {
+                                if (curiosStack.getItem() instanceof AmmoBoxItem && hand.isAmmoBox() && !access.getIsArsMode(stack) && !access.getIsIronsMode(stack)) {
+                                    ArsArmsReloadArsModeActive.active(stack, curiosStack, player, false);
+                                } else {
                                     ArsArmsReloadArsModeCancel.remove(stack, player);
                                 }
                             }
@@ -113,7 +114,7 @@ public class LivingEntityMixin {
                 if (index != null) {
                     GunData gunData = index.getGunData();
                     if (gunData != null) {
-                        int ammoCount = iGun.useInventoryAmmo(stack) ? ArsArmsAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                        int ammoCount = iGun.useInventoryAmmo(stack) ? ArmsLibAmmoUtil.handleInventoryAmmo(stack, player.getInventory()) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                 iGun.getCurrentAmmoCount(stack) + (iGun.hasBulletInBarrel(stack) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                         ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                         if ((iGun.useInventoryAmmo(stack) || (!iGun.useInventoryAmmo(stack) && ammoCount <= 0)) && access.getIsArsMode(stack)) {

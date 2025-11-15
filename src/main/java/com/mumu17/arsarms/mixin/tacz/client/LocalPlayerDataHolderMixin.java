@@ -1,9 +1,9 @@
 package com.mumu17.arsarms.mixin.tacz.client;
 
+import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.network.ArsArmsNetworkHandler;
 import com.mumu17.arsarms.network.RequestSyncReloadArsModeMessage;
-import com.mumu17.arsarms.util.ArsArmsAmmoUtil;
 import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
 import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.TimelessAPI;
@@ -49,7 +49,7 @@ public class LocalPlayerDataHolderMixin {
                     if (index != null) {
                         GunData gunData = index.getGunData();
                         if (gunData != null) {
-                            int ammoCount = useInventoryAmmo ? ArsArmsAmmoUtil.handleInventoryAmmo(currentGunItem, player.getInventory()) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
+                            int ammoCount = useInventoryAmmo ? ArmsLibAmmoUtil.handleInventoryAmmo(currentGunItem, player.getInventory()) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(currentGunItem) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
                             if (ammoCount <= 0 && reloadAmmoData) {

@@ -6,6 +6,7 @@
   "refmap": "arsarms.refmap.json",
   "mixins": [
     "LivingEntityMixin",
+    "ars_nouveau.EnchantmentRecipeMixin",
     "tacz.EntityKineticBulletMixin",
     "tacz.EntityUtilMixin",
     "tacz.GunItemBuilderMixin",
@@ -14,7 +15,6 @@
   ],
   "client": [
     "GuiGraphicsMixin",
-    "tacz.client.GunHudOverlayMixin",
     "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "injectors": {
