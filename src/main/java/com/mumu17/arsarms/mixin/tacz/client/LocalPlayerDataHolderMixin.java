@@ -4,8 +4,8 @@ import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.network.ArsArmsNetworkHandler;
 import com.mumu17.arsarms.network.RequestSyncReloadArsModeMessage;
-import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
-import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.arsarms.util.ArsArmsCuriosUtil;
+import com.mumu17.arscurios.util.InteractionHandUtil;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
@@ -14,6 +14,7 @@ import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.Bolt;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,8 +43,8 @@ public class LocalPlayerDataHolderMixin {
                 ItemStack currentGunItem = player.getMainHandItem();
                 if (currentGunItem.getItem() instanceof AbstractGunItem && currentGunItem.getItem() instanceof IGun iGun) {
                     GunItemNbt access = (GunItemNbt) iGun;
-                    boolean reloadAmmoData = access.getIsArsMode(currentGunItem);
-                    ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
+                    //boolean reloadAmmoData = access.getIsArsMode(currentGunItem);
+                    InteractionHand hand = access.getInteractionHand(currentGunItem);
                     boolean useInventoryAmmo = iGun.useInventoryAmmo(currentGunItem);
                     CommonGunIndex index = TimelessAPI.getCommonGunIndex(iGun.getGunId(currentGunItem)).orElse(null);
                     if (index != null) {
@@ -52,8 +53,8 @@ public class LocalPlayerDataHolderMixin {
                             int ammoCount = useInventoryAmmo ? ArmsLibAmmoUtil.handleInventoryAmmo(currentGunItem, player.getInventory()) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0) :
                                     iGun.getCurrentAmmoCount(currentGunItem) + (iGun.hasBulletInBarrel(currentGunItem) && gunData.getBolt() != Bolt.OPEN_BOLT ? 1 : 0);
                             ammoCount = Math.min(ammoCount, MAX_AMMO_COUNT);
-                            if (ammoCount <= 0 && reloadAmmoData) {
-                                ArsArmsNetworkHandler.CHANNEL.sendToServer(new RequestSyncReloadArsModeMessage(player.getInventory().selected, hand.getSlotName(),3));
+                            if (ammoCount <= 0/* && reloadAmmoData*/) {
+                                ArsArmsNetworkHandler.CHANNEL.sendToServer(new RequestSyncReloadArsModeMessage(player.getInventory().selected, InteractionHandUtil.getSlotName(hand),3));
                             }
                         }
                     }

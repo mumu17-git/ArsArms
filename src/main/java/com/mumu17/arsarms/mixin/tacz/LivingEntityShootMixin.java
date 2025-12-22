@@ -2,10 +2,6 @@ package com.mumu17.arsarms.mixin.tacz;
 
 import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
-import com.mumu17.arsarms.util.ArsArmsReloadArsModeActive;
-import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
-import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
-import com.mumu17.arscurios.util.ExtendedHand;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
@@ -42,8 +38,8 @@ public class LivingEntityShootMixin {
             ItemStack currentGunItem = this.data.currentGunItem.get();
             if (currentGunItem.getItem() instanceof AbstractGunItem gunItem) {
                 if (gunItem.useInventoryAmmo(currentGunItem)) {
-                    ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(shooter);
-                    ArsArmsReloadArsModeActive.active(currentGunItem, ArsCuriosInventoryHelper.getCuriosInventoryItem(shooter, hand.getSlotName()), shooter, true);
+                    //InteractionHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(shooter);
+                    //ArsArmsReloadArsModeActive.active(currentGunItem, ArsCuriosInventoryHelper.getCuriosInventoryItem(shooter, hand.getSlotName()), shooter, true);
                 }
 
                 if (this.data.currentGunItem.get().getItem() instanceof IGun iGun) {

@@ -6,10 +6,11 @@ import com.mumu17.arsarms.network.ArsArmsNetworkHandler;
 import com.mumu17.arsarms.network.RequestSyncChargedManaMessage;
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
-import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.arscurios.util.InteractionHandUtil;
 import com.tacz.guns.item.AmmoBoxItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -24,10 +25,10 @@ public class ChargeManaToAmmoBoxTick {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
-            for (ExtendedHand hand : ExtendedHand.values()) {
-                ItemStack stack = ArsCuriosInventoryHelper.getCuriosInventoryItem(mc.player, hand.getSlotName());
+            for (InteractionHand hand : InteractionHand.values()) {
+                ItemStack stack = ArsCuriosInventoryHelper.getCuriosInventoryItem(mc.player, InteractionHandUtil.getSlotName(hand));
                 if (isTargetItem(stack)) {
-                    chargeManaOrCancel(mc.player, stack, hand.getSlotName());
+                    chargeManaOrCancel(mc.player, stack, InteractionHandUtil.getSlotName(hand));
                 }
             }
         }

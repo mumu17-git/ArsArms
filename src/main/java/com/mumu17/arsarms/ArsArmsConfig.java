@@ -19,7 +19,7 @@ public class ArsArmsConfig {
         public Common(ForgeConfigSpec.Builder builder) {
             damageMultiplier = builder
                     .comment("Projectile damage amplifier for TaCZ Gun projectiles.\nThe higher the value, the greater the damage.")
-                    .defineInRange("damageMultiplier", 0.0, 0.0, 1.0);
+                    .defineInRange("damageMultiplier", 1.0, 0.0, 1.0);
             damageAmplifier = builder
                     .comment("Magic damage amplifier for TaCZ Gun projectiles.\nThe higher the value, the less damage.")
                     .defineInRange("damageAmplifier", 15.0, 0.01, 100.0);

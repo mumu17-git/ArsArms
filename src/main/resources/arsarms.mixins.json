@@ -14,7 +14,7 @@
     "tacz.ModernKineticGunItemMixin"
   ],
   "client": [
-    "GuiGraphicsMixin",
+    "client.GuiGraphicsMixin",
     "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "injectors": {

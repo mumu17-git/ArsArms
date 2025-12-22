@@ -1,34 +1,44 @@
 package com.mumu17.arsarms.mixin;
 
-import com.mumu17.armslib.util.ArmsLibAmmoUtil;
 import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.util.*;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
-import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
-import com.mumu17.arscurios.util.ExtendedHand;
-import com.tacz.guns.api.TimelessAPI;
+import com.mumu17.arscurios.util.InteractionHandUtil;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.AmmoBoxItem;
-import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.Bolt;
-import com.tacz.guns.resource.pojo.data.gun.BulletData;
-import com.tacz.guns.resource.pojo.data.gun.GunData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
+    @Inject(method = "tick", at = @At("HEAD"))
+    public void onTick(CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (entity instanceof Player player) {
+            ItemStack mainhand = player.getMainHandItem();
+            if (mainhand.getItem() instanceof IGun iGun) {
+                GunItemNbt access = (GunItemNbt) iGun;
+                InteractionHand curiosSlot = ArsArmsCuriosUtil.getCuriosSlotFromGun(player, mainhand);
+                ItemStack ammoBox = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, InteractionHandUtil.getSlotName(curiosSlot));
+                if (ammoBox.getItem() instanceof AmmoBoxItem) {
+//                    access.setIsArsMode(mainhand, true);
+                    ArsArmsReloadArsModeSettings.setActive(mainhand, ammoBox, player);
+                    return;
+                }
+//                access.setIsArsMode(mainhand, false);
+                ArsArmsReloadArsModeSettings.setInActive(mainhand, ammoBox, player);
+            }
+        }
+    }
+
+    /*
     @Unique
     private static final int MAX_AMMO_COUNT = 9999;
 
@@ -140,6 +150,6 @@ public class LivingEntityMixin {
             coolDownTimeModifier = 5;
         }
         return coolDownTimeModifier;
-    }
+    }*/
 
 }

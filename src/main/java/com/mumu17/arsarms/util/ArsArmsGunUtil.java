@@ -2,6 +2,7 @@ package com.mumu17.arsarms.util;
 
 import com.mumu17.armslib.util.GunItemNbt;
 import com.tacz.guns.api.item.IGun;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 public class ArsArmsGunUtil {
@@ -11,5 +12,6 @@ public class ArsArmsGunUtil {
         access.setLastAmmoCount(gun, ammoCount);
         access.setGunDamage(gun, 0.0F);
         access.setLastTimestamp(gun, System.currentTimeMillis());
+        access.setInteractionHand(gun, InteractionHand.MAIN_HAND);
     }
 }

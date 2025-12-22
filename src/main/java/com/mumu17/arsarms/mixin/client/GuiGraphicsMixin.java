@@ -1,4 +1,4 @@
-package com.mumu17.arsarms.mixin;
+package com.mumu17.arsarms.mixin.client;
 
 import com.mumu17.arsarms.util.ArsArmsAmmoBox;
 import com.tacz.guns.item.AmmoBoxItem;

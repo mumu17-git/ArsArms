@@ -1,5 +1,6 @@
 package com.mumu17.arsarms.mixin.tacz;
 
+import com.hollingsworth.arsnouveau.api.spell.Spell;
 import com.hollingsworth.arsnouveau.common.spell.casters.ReactiveCaster;
 import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
@@ -7,12 +8,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mumu17.armslib.util.GunItemNbt;
 import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.ArsArmsConfig;
+import com.mumu17.arsarms.util.ArsArmsAmmoBox;
+import com.mumu17.arsarms.util.ArsArmsCuriosUtil;
 import com.mumu17.arsarms.util.ArsArmsProjectileData;
-import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
-import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.arscurios.util.InteractionHandUtil;
 import com.mumu17.castlib.util.CastLibTags;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
+import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.util.TacHitResult;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -38,19 +41,33 @@ public class EntityKineticBulletMixin {
     @Shadow(remap = false) private boolean explosion;
 
     @Unique
-    public void ArsArms$castSpell(LivingEntity attacker, ItemStack s) {
-        if (attacker != null && ArsArms$canCastSpell(s)) {
-            ReactiveCaster reactiveCaster = new ReactiveCaster(s);
-            InteractionHand interactionHand = ArsCuriosLivingEntity.getPlayerExtendedHand(attacker).getVanillaHand();
-            CompoundTag tag = attacker.getPersistentData();
-            CastLibTags.saveCastModIDToTag(tag, ArsArms.MODID);
-            reactiveCaster.castSpell(attacker.getCommandSenderWorld(), attacker, interactionHand, (Component) null);
+    public void ArsArms$castSpell(LivingEntity attacker) {
+        if (attacker instanceof Player player) {
+            InteractionHand interactionHand = ArsArmsProjectileData.getInteractionHandFromPlayer(player);
+            ItemStack curiosItem = player.getItemInHand(interactionHand);
+            if (curiosItem != ItemStack.EMPTY && ArsArms$canCastSpell(curiosItem)) {
+                ReactiveCaster reactiveCaster = new ReactiveCaster(curiosItem);
+                CompoundTag tag = attacker.getPersistentData();
+                CastLibTags.saveCastModIDToTag(tag, ArsArms.MODID);
+                reactiveCaster.castSpell(attacker.getCommandSenderWorld(), attacker, interactionHand, (Component) null);
+                ArsArms$consumeManaFromAmmoBox(curiosItem);
+            }
         }
     }
 
     @Unique
     public boolean ArsArms$canCastSpell(ItemStack s) {
         return (double)s.getEnchantmentLevel((Enchantment) EnchantmentRegistry.REACTIVE_ENCHANTMENT.get()) * (double)0.25F >= Math.random() && (new ReactiveCaster(s)).getSpell().isValid();
+    }
+
+    @Unique
+    public void ArsArms$consumeManaFromAmmoBox(ItemStack curiosAmmoBox) {
+        int chargedManaCount = ArsArmsAmmoBox.getChargedManaCount(curiosAmmoBox);
+        ReactiveCaster casterData = new ReactiveCaster(curiosAmmoBox);
+        Spell spell = casterData.getSpell();
+        int cost = spell.getCost();
+        // ArsArms.LOGGER.debug("Total Mana: {}, Cost: {}", chargedManaCount, cost);
+        curiosAmmoBox.getOrCreateTag().putInt("Mana", chargedManaCount - cost);
     }
 
     @Inject(method = "onHitEntity", at = @At(value = "HEAD"), remap = false)
@@ -63,7 +80,7 @@ public class EntityKineticBulletMixin {
                 GunItemNbt access = (GunItemNbt) iGun;
                 boolean isArsMode = access.getIsArsMode(mainhand);
                 if (isArsMode) {
-                    ArsArmsProjectileData.setProjectileData(projectileEntity, result.getEntity(), null, ArsCuriosLivingEntity.getPlayerExtendedHand(player));
+                    ArsArmsProjectileData.setProjectileData(projectileEntity, result.getEntity(), null, ArsArmsCuriosUtil.getCuriosSlotFromGun(player, mainhand));
                 }
             }
         }
@@ -78,7 +95,7 @@ public class EntityKineticBulletMixin {
                 boolean isArsMode = access.getIsArsMode(mainhand);
                 if (isArsMode) {
                     if (result.getEntity().isAlive()) {
-                        ArsArms$castSpell(attacker, mainhand);
+                        ArsArms$castSpell(attacker);
                     }
                 }
             }
@@ -95,8 +112,8 @@ public class EntityKineticBulletMixin {
                 ArsArmsProjectileData arsArmsProjectileData = ArsArmsProjectileData.getProjectileData(projectileEntity);
                 if (gunItem.getItem() instanceof IGun iGun && arsArmsProjectileData != null) {
                     Entity entity = arsArmsProjectileData.getTargetEntity();
-                    ExtendedHand hand = arsArmsProjectileData.getHand();
-                    if (hand.isAmmoBox()) {
+                    InteractionHand hand = arsArmsProjectileData.getHand();
+                    if (InteractionHandUtil.isAmmoBox(hand)) {
                         if (entity != null) {
                             GunItemNbt access = (GunItemNbt) iGun;
                             boolean isArsMode = access.getIsArsMode(gunItem);
@@ -116,8 +133,8 @@ public class EntityKineticBulletMixin {
         ArsArmsProjectileData arsArmsProjectileData = ArsArmsProjectileData.getProjectileData(projectileEntity);
         if(arsArmsProjectileData != null && arsArmsProjectileData.isEnabled()) {
             Entity entity = arsArmsProjectileData.getTargetEntity();
-            ExtendedHand hand = arsArmsProjectileData.getHand();
-            if (hand.isAmmoBox()) {
+            InteractionHand hand = arsArmsProjectileData.getHand();
+            if (InteractionHandUtil.isAmmoBox(hand)) {
                 if (entity != null) {
                     if (projectileEntity.getOwner() instanceof Player player) {
                         GunItemNbt gunItemCooldown = (GunItemNbt) player.getMainHandItem().getItem();
@@ -140,7 +157,7 @@ public class EntityKineticBulletMixin {
                 GunItemNbt access = (GunItemNbt) iGun;
                 boolean isArsMode = access.getIsArsMode(mainhand);
                 if (isArsMode) {
-                    ArsArmsProjectileData.setProjectileData(projectileEntity, null, result, ArsCuriosLivingEntity.getPlayerExtendedHand(player));
+                    ArsArmsProjectileData.setProjectileData(projectileEntity, null, result,ArsArmsCuriosUtil.getCuriosSlotFromGun(player, mainhand));
                 }
             }
         }
@@ -156,7 +173,7 @@ public class EntityKineticBulletMixin {
                 boolean isArsMode = access.getIsArsMode(mainhand);
                 if (isArsMode) {
                     if (result != null) {
-                        ArsArms$castSpell(attacker, mainhand);
+                        ArsArms$castSpell(attacker);
                     }
                 }
             }

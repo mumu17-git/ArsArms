@@ -166,8 +166,10 @@ dependencies {
     implementation fg.deobf("curse.maven:curios-309927:${curios_version_cf_id}")
     implementation fg.deobf("curse.maven:geckolib-388172:${geckolib_version_cf_id}")
 
-    implementation fg.deobf("curse.maven:castlib-1310383:${cast_lib_version_cf_id}")
-    implementation fg.deobf("curse.maven:arscurios-1311075:${ars_curios_version_cf_id}")
+    //implementation fg.deobf("curse.maven:castlib-1310383:${cast_lib_version_cf_id}")
+    implementation fg.deobf("blank:castlib-1.20.1:${cast_lib_version}")
+    //implementation fg.deobf("curse.maven:arscurios-1311075:${ars_curios_version_cf_id}")
+    implementation fg.deobf("blank:arscurios-1.20.1:${ars_curios_version}")
     // implementation fg.deobf("curse.maven:armslib-1328268:${arms_lib_version_cf_id}")
     implementation fg.deobf("blank:armslib-1.20.1:${arms_lib_version}")
 

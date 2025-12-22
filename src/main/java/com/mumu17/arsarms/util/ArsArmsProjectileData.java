@@ -1,8 +1,7 @@
 package com.mumu17.arsarms.util;
 
 import com.mumu17.armslib.util.GunItemNbt;
-import com.mumu17.arscurios.util.ArsCuriosLivingEntity;
-import com.mumu17.arscurios.util.ExtendedHand;
+import com.mumu17.arscurios.util.InteractionHandUtil;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.core.BlockPos;
@@ -12,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,11 +26,11 @@ import java.util.Objects;
 public class ArsArmsProjectileData{
     private final Entity targetEntity;
     private final BlockHitResult blockHitResult;
-    private final ExtendedHand hand;
+    private final InteractionHand hand;
     private final boolean isEnabled;
     private final ItemStack iGun;
 
-    public ArsArmsProjectileData(Entity target, BlockHitResult block, ExtendedHand h, ItemStack gun, boolean enabled) {
+    public ArsArmsProjectileData(Entity target, BlockHitResult block, InteractionHand h, ItemStack gun, boolean enabled) {
         targetEntity = target;
         blockHitResult = block;
         hand = h;
@@ -46,7 +46,7 @@ public class ArsArmsProjectileData{
         return blockHitResult;
     }
 
-    public ExtendedHand getHand() {
+    public InteractionHand getHand() {
         return hand;
     }
 
@@ -64,7 +64,7 @@ public class ArsArmsProjectileData{
             ARS_ARMS_BLOCK_HIT_X = "ArsArmsBlockHitX", ARS_ARMS_BLOCK_HIT_Y = "ArsArmsBlockHitY", ARS_ARMS_BLOCK_HIT_Z = "ArsArmsBlockHitZ",
             ARS_ARMS_BLOCK_HIT_FACE = "ArsArmsBlockHitFace",
             ARS_ARMS_BLOCK_HIT_BLOCK_X = "ArsArmsBlockHitBlockX", ARS_ARMS_BLOCK_HIT_BLOCK_Y = "ArsArmsBlockHitBlockY", ARS_ARMS_BLOCK_HIT_BLOCK_Z = "ArsArmsBlockHitBlockZ",
-            ARS_ARMS_BLOCK_HIT_IS_INSIDE = "ArsArmsBlockHitIsInside";
+            ARS_ARMS_BLOCK_HIT_IS_INSIDE = "ArsArmsBlockHitIsInside", ARS_ARMS_INTERACTION_HAND_ID = "ArsArmsInteractionHandID";
 
 
     private static void ArsArms$SaveBlockHitResultToTag(CompoundTag tag, BlockHitResult hitResult) {
@@ -138,6 +138,21 @@ public class ArsArmsProjectileData{
         return ArsArms$LoadEntityFromTag(tag, player, (byte) 1);
     }
 
+    public static void setInteractionHandToPlayer(LivingEntity player, InteractionHand hand) {
+        if (hand == null || player == null) return;
+        CompoundTag tag = !player.getPersistentData().isEmpty() ? player.getPersistentData() : null;
+        if (tag == null) return;
+        tag.putString(ARS_ARMS_INTERACTION_HAND_ID, InteractionHandUtil.getSlotName(hand));
+    }
+
+    public static InteractionHand getInteractionHandFromPlayer(LivingEntity player) {
+        if (player == null) return null;
+        CompoundTag tag = !player.getPersistentData().isEmpty() ? player.getPersistentData() : null;
+        if (tag == null) return null;
+        String id = tag.getString(ARS_ARMS_INTERACTION_HAND_ID);
+        return InteractionHandUtil.getSlotByName(id);
+    }
+
     public static void setProjectileToEntity(Entity entity, Entity projectileEntity) {
         if (projectileEntity == null || entity == null) return;
         CompoundTag tag = !entity.getPersistentData().isEmpty() ? entity.getPersistentData() : null;
@@ -152,12 +167,12 @@ public class ArsArmsProjectileData{
         return ArsArms$LoadEntityFromTag(tag, entity, (byte) 1);
     }
     
-    public static void setProjectileData(Entity projectileEntity, Entity hitEntity, BlockHitResult blockHitResult, ExtendedHand extendedHand) {
+    public static void setProjectileData(Entity projectileEntity, Entity hitEntity, BlockHitResult blockHitResult, InteractionHand hand) {
         if (projectileEntity instanceof Projectile projectile){
             CompoundTag tag = projectileEntity.getPersistentData();
             setProjectileToEntity(hitEntity, projectileEntity);
             setProjectileEntityToPlayer((LivingEntity) projectile.getOwner(), projectileEntity);
-            ArsCuriosLivingEntity.setPlayerExtendedHand((LivingEntity) projectile.getOwner(), extendedHand);
+            setInteractionHandToPlayer((LivingEntity) projectile.getOwner(), hand);
             ArsArms$SaveEntityToTag(tag, hitEntity, projectileEntity.level(), (byte) 0);
             ArsArms$SaveBlockHitResultToTag(tag, blockHitResult);
         }
@@ -172,7 +187,7 @@ public class ArsArmsProjectileData{
             Entity shooter = ((EntityKineticBullet) projectileEntity).getOwner();
             if (shooter instanceof Player player) {
                 ItemStack gunItem = shooter.getSlot(player.getInventory().selected).get();
-                ExtendedHand hand = ArsCuriosLivingEntity.getPlayerExtendedHand(player);
+                InteractionHand hand = getInteractionHandFromPlayer(player);
                 if ((hitEntity != null || blockHitResult != null) && gunItem.getItem() instanceof IGun iGun) {
                     GunItemNbt access = (GunItemNbt) iGun;
                     boolean isArsMode = access.getIsArsMode(gunItem);
@@ -180,7 +195,7 @@ public class ArsArmsProjectileData{
                 }
             }
         }
-        return new ArsArmsProjectileData(null, null, ExtendedHand.MAIN_HAND, ItemStack.EMPTY, false);
+        return new ArsArmsProjectileData(null, null, InteractionHand.MAIN_HAND, ItemStack.EMPTY, false);
     }
 }
 

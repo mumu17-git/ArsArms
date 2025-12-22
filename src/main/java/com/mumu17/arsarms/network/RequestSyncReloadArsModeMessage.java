@@ -1,7 +1,7 @@
 package com.mumu17.arsarms.network;
 
-import com.mumu17.arsarms.util.ArsArmsReloadArsModeActive;
-import com.mumu17.arsarms.util.ArsArmsReloadArsModeCancel;
+import com.mumu17.armslib.util.GunItemNbt;
+import com.mumu17.arsarms.util.ArsArmsReloadArsModeSettings;
 import com.mumu17.arscurios.util.ArsCuriosInventoryHelper;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.item.AmmoBoxItem;
@@ -37,15 +37,20 @@ public class RequestSyncReloadArsModeMessage {
             if (player != null) {
                 var gunStack = player.getInventory().getItem(msg.gunSlot);
                 var curiosStack = ArsCuriosInventoryHelper.getCuriosInventoryItem(player, msg.curiosSlot);
-                if (!curiosStack.isEmpty() && !gunStack.isEmpty() && curiosStack.getItem() instanceof AmmoBoxItem && gunStack.getItem() instanceof IGun) {
+                if (!curiosStack.isEmpty() && !gunStack.isEmpty() && curiosStack.getItem() instanceof AmmoBoxItem && gunStack.getItem() instanceof IGun iGun) {
+                    GunItemNbt access = (GunItemNbt) iGun;
                     if (msg.flag == 0) {
-                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, player, true);
+//                        access.setIsArsMode(gunStack, true);
+                        ArsArmsReloadArsModeSettings.setActive(gunStack, curiosStack, player);
                     } else if (msg.flag == 1) {
-                        ArsArmsReloadArsModeActive.active(gunStack, curiosStack, player, false);
+//                        access.setIsArsMode(gunStack, true);
+                        ArsArmsReloadArsModeSettings.setActive(gunStack, curiosStack, player);
                     } else if (msg.flag == 2) {
-                        ArsArmsReloadArsModeCancel.remove(gunStack, player);
+//                        access.setIsArsMode(gunStack, false);
+                        ArsArmsReloadArsModeSettings.setInActive(gunStack, curiosStack, player);
                     } else if (msg.flag == 3) {
-                        ArsArmsReloadArsModeCancel.cancel(gunStack, curiosStack);
+//                        access.setIsArsMode(gunStack, false);
+                        ArsArmsReloadArsModeSettings.setInActive(gunStack, curiosStack, player);
                     }
                 }
             }
