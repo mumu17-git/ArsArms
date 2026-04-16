@@ -16,9 +16,9 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'idea'
-    id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
+    id 'maven-publish'
 
 }
 
@@ -167,11 +167,11 @@ dependencies {
     implementation fg.deobf("curse.maven:geckolib-388172:${geckolib_version_cf_id}")
 
     //implementation fg.deobf("curse.maven:castlib-1310383:${cast_lib_version_cf_id}")
-    implementation fg.deobf("blank:castlib-1.20.1:${cast_lib_version}")
+    // implementation fg.deobf("blank:castlib-1.20.1:${cast_lib_version}")
     //implementation fg.deobf("curse.maven:arscurios-1311075:${ars_curios_version_cf_id}")
-    implementation fg.deobf("blank:arscurios-1.20.1:${ars_curios_version}")
+    // implementation fg.deobf("blank:arscurios-1.20.1:${ars_curios_version}")
     // implementation fg.deobf("curse.maven:armslib-1328268:${arms_lib_version_cf_id}")
-    implementation fg.deobf("blank:armslib-1.20.1:${arms_lib_version}")
+    // implementation fg.deobf("blank:armslib-1.20.1:${arms_lib_version}")
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version_cf_id}")
     runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6608233")

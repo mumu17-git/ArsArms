@@ -64,31 +64,6 @@ description='''${mod_description}'''
 
 [[dependencies."${mod_id}"]]
    # This is a dependency on the mod itself, which is useful for mods that have multiple modules
-   modId="castlib"
-   mandatory=true
-   versionRange="[${castlib_version},)"
-   ordering="NONE"
-   side="BOTH"
-
-
-[[dependencies."${mod_id}"]]
-   # This is a dependency on the mod itself, which is useful for mods that have multiple modules
-   modId="arscurios"
-   mandatory=true
-   versionRange="[${arscurios_version},)"
-   ordering="NONE"
-   side="BOTH"
-
-[[dependencies."${mod_id}"]]
-    # This is a dependency on the mod itself, which is useful for mods that have multiple modules
-    modId="armslib"
-    mandatory=true
-    versionRange="[${arms_lib_version},)"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies."${mod_id}"]]
-   # This is a dependency on the mod itself, which is useful for mods that have multiple modules
    modId="tacz"
    mandatory=true
    versionRange="[${tacz_version},)"

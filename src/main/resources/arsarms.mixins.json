@@ -5,17 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "arsarms.refmap.json",
   "mixins": [
-    "LivingEntityMixin",
-    "ars_nouveau.EnchantmentRecipeMixin",
-    "tacz.EntityKineticBulletMixin",
-    "tacz.EntityUtilMixin",
-    "tacz.GunItemBuilderMixin",
-    "tacz.LivingEntityShootMixin",
-    "tacz.ModernKineticGunItemMixin"
   ],
   "client": [
-    "client.GuiGraphicsMixin",
-    "tacz.client.LocalPlayerDataHolderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

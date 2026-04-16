@@ -1,5 +1,7 @@
 {
   "key.ironsarms.irons_mode": "銃による魔法モードの切り替え",
   "tooltip.ironsarms.irons_mode.off": "モード: ArsArms",
-  "tooltip.ironsarms.irons_mode.on": "モード: IronsArms"
+  "tooltip.ironsarms.irons_mode.on": "モード: IronsArms",
+  "tooltip.arsarms.inscribed_title": "//--- Ars Nouveau ---//",
+  "tooltip.arsarms.mana": "マナ"
 }

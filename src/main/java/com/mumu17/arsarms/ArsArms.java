@@ -1,10 +1,9 @@
 package com.mumu17.arsarms;
 
 import com.mojang.logging.LogUtils;
-import com.mumu17.arsarms.util.ArsArmsAmplifierProvider;
-import com.mumu17.arsarms.util.ArsArmsGunCooldownProvider;
-import com.mumu17.arsarms.util.ArsArmsProjectileProvider;
-import com.mumu17.castlib.util.ProviderRegistry;
+import com.mumu17.arsarms.event.ArsArmsBulletEvents;
+import com.mumu17.arsarms.register.ModNetworking;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -18,8 +17,7 @@ public class ArsArms {
 
     public ArsArms() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ArsArmsConfig.COMMON_SPEC);
-        ProviderRegistry.registerProjectileProvider(MODID, new ArsArmsProjectileProvider());
-        ProviderRegistry.registerArmsNbtProvider(MODID, new ArsArmsGunCooldownProvider());
-        ProviderRegistry.registerDamageAmplifierProvider(MODID, new ArsArmsAmplifierProvider());
+        MinecraftForge.EVENT_BUS.register(ArsArmsBulletEvents.class);
+        ModNetworking.register();
     }
 }

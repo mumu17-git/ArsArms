@@ -13,16 +13,12 @@ public class ArsArmsConfig {
     }
 
     public static class Common {
-        public final ForgeConfigSpec.DoubleValue damageAmplifier;
-        public final ForgeConfigSpec.DoubleValue damageMultiplier;
+        public final ForgeConfigSpec.BooleanValue castChance;
 
         public Common(ForgeConfigSpec.Builder builder) {
-            damageMultiplier = builder
-                    .comment("Projectile damage amplifier for TaCZ Gun projectiles.\nThe higher the value, the greater the damage.")
-                    .defineInRange("damageMultiplier", 1.0, 0.0, 1.0);
-            damageAmplifier = builder
-                    .comment("Magic damage amplifier for TaCZ Gun projectiles.\nThe higher the value, the less damage.")
-                    .defineInRange("damageAmplifier", 15.0, 0.01, 100.0);
+            castChance = builder
+                    .comment("Control spell activation depending on the Reactive Enchantment level")
+                    .define("castChance", false);
         }
     }
 }
