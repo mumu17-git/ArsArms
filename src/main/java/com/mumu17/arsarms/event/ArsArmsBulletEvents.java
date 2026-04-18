@@ -40,9 +40,7 @@ public class ArsArmsBulletEvents {
                 event.setCanceled(true);
                 return;
             }
-            if (player instanceof ServerPlayer) {
-                GunTags.addMana(gunStack, -manaCost);
-            }
+            GunTags.addMana(gunStack, -manaCost);
         }
     }
 

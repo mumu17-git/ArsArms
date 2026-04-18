@@ -31,14 +31,16 @@ public class RequestSyncChargedManaMessage {
         ctx.get().enqueueWork(() -> {
             var player = ctx.get().getSender();
             if (player != null) {
-                ItemStack stack = player.getMainHandItem();
-                if (!stack.isEmpty() && stack.getItem() instanceof IGun) {
-                    int chargedManaCount = GunTags.getMana(stack);
-                    int removeManaCount = (int) ((float) msg.manaCount - (float) chargedManaCount);
-                    if (removeManaCount > 0.0) {
-                        CapabilityRegistry.getMana(player).ifPresent((mana) -> mana.removeMana(removeManaCount));
+                for (ItemStack stack : player.getInventory().items) {
+                    if (!stack.isEmpty() && stack.getItem() instanceof IGun) {
+                        int chargedManaCount = GunTags.getMana(stack);
+                        int removeManaCount = (int) ((float) msg.manaCount - (float) chargedManaCount);
+                        if (removeManaCount > 0.0) {
+                            CapabilityRegistry.getMana(player).ifPresent((mana) -> mana.removeMana(removeManaCount));
+                        }
+                        GunTags.addMana(stack, removeManaCount);
+                        break;
                     }
-                    GunTags.addMana(stack, removeManaCount);
                 }
             }
         });
