@@ -1,6 +1,8 @@
 package com.mumu17.arsarms.client;
 
 import com.hollingsworth.arsnouveau.api.util.ManaUtil;
+import com.hollingsworth.arsnouveau.common.enchantment.ReactiveEnchantment;
+import com.hollingsworth.arsnouveau.setup.registry.EnchantmentRegistry;
 import com.mumu17.arsarms.ArsArms;
 import com.mumu17.arsarms.network.RequestSyncChargedManaMessage;
 import com.mumu17.arsarms.register.ModNetworking;
@@ -29,7 +31,7 @@ public class ChargeManaToAmmoBoxTick {
             Player player = mc.player;
             if (player != null) {
                 for (ItemStack stack : player.getInventory().items) {
-                    if (!GunTags.isTargetItem(stack)) continue;
+                    if (!GunTags.isTargetItem(stack) || !stack.getAllEnchantments().containsKey(EnchantmentRegistry.REACTIVE_ENCHANTMENT.get())) continue;
                     chargeManaOrCancel(player, stack);
                     return;
                 }
