@@ -11,7 +11,6 @@ import com.tacz.guns.api.event.server.AmmoHitBlockEvent;
 import com.tacz.guns.api.item.IGun;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,11 +19,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Mod.EventBusSubscriber(modid = ArsArms.MODID)
 public class ArsArmsBulletEvents {
+
+    private static final List<UUID> castingPlayers = new ArrayList<>(List.of());
 
     @SubscribeEvent
     public static void onGunFire(GunFireEvent event) {
@@ -37,17 +43,20 @@ public class ArsArmsBulletEvents {
         if (!player.isCreative()) {
             int manaCost = reactiveCaster.getSpell().getCost();
             if (GunTags.getMana(gunStack) < manaCost) {
-                event.setCanceled(true);
                 return;
             }
             GunTags.addMana(gunStack, -manaCost);
         }
+        castingPlayers.add(player.getUUID());
     }
 
     @SubscribeEvent
     public static void onEntityHurtPre(EntityHurtByGunEvent.Pre event) {
         if (!(event.getAttacker() instanceof Player player)) return;
         if (!(event.getHurtEntity() instanceof LivingEntity livingEntity)) return;
+        if (!castingPlayers.contains(player.getUUID())) return;
+        castingPlayers.remove(player.getUUID());
+
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof IGun)) return;
         castSpell(livingEntity, stack);
@@ -58,6 +67,8 @@ public class ArsArmsBulletEvents {
         if (!(event.getAmmo().getOwner() instanceof Player player)) return;
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof IGun)) return;
+        if (!castingPlayers.contains(player.getUUID())) return;
+        castingPlayers.remove(player.getUUID());
 
         Vec3 hitPos = event.getHitResult().getLocation();
 

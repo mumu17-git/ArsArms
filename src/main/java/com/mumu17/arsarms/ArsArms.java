@@ -25,7 +25,7 @@ public class ArsArms {
             throw new ModLoadingException(
                     ModLoadingContext.get().getActiveContainer().getModInfo(),
                     ModLoadingStage.CONSTRUCT,
-                    "This mod is incompatible with §eArsCurios, ArmsLib and CastLib§r. Please remove them",
+                    "This mod is incompatible with §eArsCurios, ArmsLib and CastLib§r. Please remove them.",
                     new Throwable()
             );
         }
